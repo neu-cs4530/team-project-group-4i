@@ -1,0 +1,13 @@
+import React from 'react';
+
+import Button from '@material-ui/core/Button';
+
+export default function Emoticon() {
+  return (
+    <Button
+    data-cy-more-button
+    >
+      Emoticon
+    </Button>
+  );
+}
