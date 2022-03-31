@@ -7,7 +7,7 @@ export default function Emoticon() {
     <Button
     data-cy-more-button
     >
-      Emoticon
+      Emoticon 
     </Button>
   );
 }
