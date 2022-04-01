@@ -5,6 +5,7 @@ import Button from '@material-ui/core/Button';
 import { Typography, Grid, Hidden } from '@material-ui/core';
 import EndCallButton from '../Buttons/EndCallButton/EndCallButton';
 import StatusMessage from './StatusMessage/StatusMessage'
+import Emoticon from './Emoticon/Emoticon';
 import { isMobile } from '../../utils';
 import Menu from './Menu/Menu';
 import useRoomState from '../../hooks/useRoomState/useRoomState';
@@ -84,6 +85,7 @@ export default function MenuBar() {
           <Grid item>
             <Grid container justifyContent="center">
             {process.env.REACT_APP_DISABLE_TWILIO_CONVERSATIONS !== 'true' && <ToggleChatButton />}
+              <Emoticon />
               <ToggleAudioButton disabled={isReconnecting} />
               <ToggleVideoButton disabled={isReconnecting} />
               {!isSharingScreen && !isMobile && <ToggleScreenShareButton disabled={isReconnecting} />}
