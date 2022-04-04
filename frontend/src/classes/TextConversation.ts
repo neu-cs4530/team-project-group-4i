@@ -73,6 +73,7 @@ export default class TextConversation {
 type MessageCallback = (message: ChatMessage) => void;
 export type ChatMessage = {
   author: string;
+  toUser: string;
   sid: string;
   body: string;
   dateCreated: Date;

@@ -2,6 +2,7 @@ import { customAlphabet, nanoid } from 'nanoid';
 import { BoundingBox, ServerConversationArea } from '../client/TownsServiceClient';
 import { ChatMessage, UserLocation } from '../CoveyTypes';
 import CoveyTownListener from '../types/CoveyTownListener';
+import { PlayerCoveyTownListener } from '../types/PlayerCoveyTownListener';
 import Player from '../types/Player';
 import PlayerSession from '../types/PlayerSession';
 import IVideoClient from './IVideoClient';
@@ -64,7 +65,7 @@ export default class CoveyTownController {
   private _videoClient: IVideoClient = TwilioVideo.getInstance();
 
   /** The list of CoveyTownListeners that are subscribed to events in this town * */
-  private _listeners: CoveyTownListener[] = [];
+  private _listeners: PlayerCoveyTownListener[] = [];
 
   /** The list of currently active ConversationAreas in this town */
   private _conversationAreas: ServerConversationArea[] = [];
@@ -106,7 +107,7 @@ export default class CoveyTownController {
     );
 
     // Notify other players that this player has joined
-    this._listeners.forEach(listener => listener.onPlayerJoined(newPlayer));
+    this._listeners.forEach(listener => listener.coveyTownListener.onPlayerJoined(newPlayer));
 
     return theSession;
   }
@@ -119,7 +120,7 @@ export default class CoveyTownController {
   destroySession(session: PlayerSession): void {
     this._players = this._players.filter(p => p.id !== session.player.id);
     this._sessions = this._sessions.filter(s => s.sessionToken !== session.sessionToken);
-    this._listeners.forEach(listener => listener.onPlayerDisconnected(session.player));
+    this._listeners.forEach(listener => listener.coveyTownListener.onPlayerDisconnected(session.player));
     const conversation = session.player.activeConversationArea;
     if (conversation) {
       this.removePlayerFromConversationArea(session.player, conversation);
@@ -149,11 +150,11 @@ export default class CoveyTownController {
       }
       if (conversation) {
         conversation.occupantsByID.push(player.id);
-        this._listeners.forEach(listener => listener.onConversationAreaUpdated(conversation));
+        this._listeners.forEach(listener => listener.coveyTownListener.onConversationAreaUpdated(conversation));
       }
     }
 
-    this._listeners.forEach(listener => listener.onPlayerMoved(player));
+    this._listeners.forEach(listener => listener.coveyTownListener.onPlayerMoved(player));
   }
 
   /**
@@ -169,9 +170,9 @@ export default class CoveyTownController {
     conversation.occupantsByID.splice(conversation.occupantsByID.findIndex(p=>p === player.id), 1);
     if (conversation.occupantsByID.length === 0) {
       this._conversationAreas.splice(this._conversationAreas.findIndex(conv => conv === conversation), 1);
-      this._listeners.forEach(listener => listener.onConversationAreaDestroyed(conversation));
+      this._listeners.forEach(listener => listener.coveyTownListener.onConversationAreaDestroyed(conversation));
     } else {
-      this._listeners.forEach(listener => listener.onConversationAreaUpdated(conversation));
+      this._listeners.forEach(listener => listener.coveyTownListener.onConversationAreaUpdated(conversation));
     }
   }
 
@@ -205,7 +206,7 @@ export default class CoveyTownController {
     const playersInThisConversation = this.players.filter(player => player.isWithin(newArea));
     playersInThisConversation.forEach(player => {player.activeConversationArea = newArea;});
     newArea.occupantsByID = playersInThisConversation.map(player => player.id);
-    this._listeners.forEach(listener => listener.onConversationAreaUpdated(newArea));
+    this._listeners.forEach(listener => listener.coveyTownListener.onConversationAreaUpdated(newArea));
     return true;
   }
 
@@ -231,7 +232,7 @@ export default class CoveyTownController {
    *
    * @param listener New listener
    */
-  addTownListener(listener: CoveyTownListener): void {
+  addTownListener(listener: PlayerCoveyTownListener): void {
     this._listeners.push(listener);
   }
 
@@ -241,12 +242,13 @@ export default class CoveyTownController {
    * @param listener The listener to unsubscribe, must be a listener that was registered
    * with addTownListener, or otherwise will be a no-op
    */
-  removeTownListener(listener: CoveyTownListener): void {
+  removeTownListener(listener: PlayerCoveyTownListener): void {
     this._listeners = this._listeners.filter(v => v !== listener);
   }
 
   onChatMessage(message: ChatMessage): void {
-    this._listeners.forEach(listener => listener.onChatMessage(message));
+    this._listeners.filter(listener => listener.playerUsername === message.toUser)
+      .forEach(listener => listener.coveyTownListener.onChatMessage(message));
   }
 
   /**
@@ -260,7 +262,7 @@ export default class CoveyTownController {
   }
 
   disconnectAllPlayers(): void {
-    this._listeners.forEach(listener => listener.onTownDestroyed());
+    this._listeners.forEach(listener => listener.coveyTownListener.onTownDestroyed());
   }
 
 }

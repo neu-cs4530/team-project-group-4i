@@ -108,6 +108,8 @@ export default function ChatInput({ conversation, isChatWindowOpen }: ChatInputP
 
   const handleSendMessage = (message: string) => {
     if (isValidMessage) {
+      // add toUser field to sendMessage and this has to change whenever the select option value changes
+      // const toUser = document.getElementById("dmSelection")!.value;
       conversation.sendMessage(message.trim());
       setMessageBody('');
     }
