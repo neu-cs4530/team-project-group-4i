@@ -41,6 +41,7 @@ export default class TextConversation {
       sid: nanoid(),
       body: message,
       author: this._authorName,
+      toUser: 'placeholder',
       dateCreated: new Date(),
     };
     this._socket.emit('chatMessage', msg);
