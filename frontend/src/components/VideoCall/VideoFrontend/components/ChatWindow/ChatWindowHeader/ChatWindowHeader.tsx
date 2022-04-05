@@ -30,7 +30,7 @@ const useStyles = makeStyles(() =>
   })
 );
 
-export default function ChatWindowHeader() {
+export default function ChatWindowHeader({onRecipientChange}: any) {
   const classes = useStyles();
   const { setIsChatWindowOpen } = useChatContext();
   const { userName } = useCoveyAppState();
@@ -39,7 +39,10 @@ export default function ChatWindowHeader() {
   return (
     <div className={classes.container}>
       <div className={classes.text}>Chat</div>
-      <select id={"dmUser"}>
+      <select id={"dmUser"} 
+              onChange = {(e) =>
+              onRecipientChange(e.target.value)}>
+        
         <option value={"Everyone"} selected>
           Everyone
         </option>
