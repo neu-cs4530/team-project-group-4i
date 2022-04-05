@@ -3,6 +3,8 @@ import { makeStyles, createStyles } from '@material-ui/core/styles';
 import CloseIcon from '../../../icons/CloseIcon';
 
 import useChatContext from '../../../hooks/useChatContext/useChatContext';
+import usePlayersInTown from '../../../../../../hooks/usePlayersInTown';
+import useCoveyAppState from '../../../../../../hooks/useCoveyAppState';
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -31,10 +33,24 @@ const useStyles = makeStyles(() =>
 export default function ChatWindowHeader() {
   const classes = useStyles();
   const { setIsChatWindowOpen } = useChatContext();
+  const { userName } = useCoveyAppState();
+  const playersInTown = usePlayersInTown();
 
   return (
     <div className={classes.container}>
       <div className={classes.text}>Chat</div>
+      <select>
+        <option value={"Everyone"} selected>
+          Everyone
+        </option>
+        {
+          playersInTown.filter(player => player.userName !== userName)
+            .map(player => 
+            <option value={player.userName}>
+              {player.userName}
+            </option>)
+        }
+      </select>
       <button className={classes.closeChatWindow} onClick={() => setIsChatWindowOpen(false)}>
         <CloseIcon />
       </button>
