@@ -36,12 +36,12 @@ export default class TextConversation {
    * Send a text message to this channel
    * @param message
    */
-  public sendMessage(message: string) {
+  public sendMessage(message: string, toUser: string) {
     const msg: ChatMessage = {
       sid: nanoid(),
       body: message,
       author: this._authorName,
-      toUser: 'placeholder',
+      toUser,
       dateCreated: new Date(),
     };
     this._socket.emit('chatMessage', msg);

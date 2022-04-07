@@ -63,7 +63,7 @@ const useStyles = makeStyles(theme => ({
 interface ChatInputProps {
   conversation: TextConversation;
   isChatWindowOpen: boolean;
-  recipient: String;
+  recipient: string;
 }
 
 const ALLOWED_FILE_TYPES =
@@ -111,7 +111,7 @@ export default function ChatInput({ conversation, isChatWindowOpen, recipient }:
     if (isValidMessage) {
       // add toUser field to sendMessage and this has to change whenever the select option value changes
       // const toUser = document.getElementById("dmSelection")!.value;
-      conversation.sendMessage(message.trim());
+      conversation.sendMessage(message.trim(), recipient);
       setMessageBody('');
     }
   };

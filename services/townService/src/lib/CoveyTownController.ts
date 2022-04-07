@@ -250,7 +250,8 @@ export default class CoveyTownController {
     if (message.toUser === "Everyone") {
       this._listeners.forEach(listener => listener.coveyTownListener.onChatMessage(message));
     } else {
-      this._listeners.filter(listener => listener.playerUsername === message.toUser)
+      this._listeners.filter(listener => listener.playerUsername === message.toUser || 
+        listener.playerUsername === message.author)
         .forEach(listener => listener.coveyTownListener.onChatMessage(message));
     }
   }
