@@ -52,7 +52,10 @@ export default function ChatWindowHeader() {
   return (
     <div className={classes.container}>
       <div className={classes.text}>Chat</div>
-      <select>
+      <select id={"dmUser"} 
+              onChange = {(e) =>
+              onRecipientChange(e.target.value)}>
+        
         <option value={"Everyone"} selected>
           Everyone
         </option>

@@ -36,11 +36,12 @@ export default class TextConversation {
    * Send a text message to this channel
    * @param message
    */
-  public sendMessage(message: string) {
+  public sendMessage(message: string, toUser: string) {
     const msg: ChatMessage = {
       sid: nanoid(),
       body: message,
       author: this._authorName,
+      toUser,
       dateCreated: new Date(),
     };
     this._socket.emit('chatMessage', msg);
@@ -73,6 +74,7 @@ export default class TextConversation {
 type MessageCallback = (message: ChatMessage) => void;
 export type ChatMessage = {
   author: string;
+  toUser: string;
   sid: string;
   body: string;
   dateCreated: Date;
