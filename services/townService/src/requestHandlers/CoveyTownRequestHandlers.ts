@@ -254,7 +254,8 @@ export function townSubscriptionHandler(socket: Socket): void {
 
   // Create an adapter that will translate events from the CoveyTownController into
   // events that the socket protocol knows about
-  const listener = townSocketAdapter(socket);
+  const listener = {coveyTownListener: townSocketAdapter(socket),
+                    playerUsername: s.player.userName};
   townController.addTownListener(listener);
 
   // Register an event listener for the client socket: if the client disconnects,
