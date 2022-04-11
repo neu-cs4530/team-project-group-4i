@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import ChatWindowHeader from './ChatWindowHeader/ChatWindowHeader';
 import ChatInput from './ChatInput/ChatInput';
@@ -37,16 +37,24 @@ const useStyles = makeStyles((theme: Theme) =>
 // In this component, we are toggling the visibility of the ChatWindow with CSS instead of
 // conditionally rendering the component in the DOM. This is done so that the ChatWindow is
 // not unmounted while a file upload is in progress.
-
 export default function ChatWindow() {
   const classes = useStyles();
   const { isChatWindowOpen, messages, conversation } = useChatContext();
+  let [userRecipient, changeRecipient] = useState("Everyone");
+  
+  const handleRecipientChange = (recipient: any) => {
+    changeRecipient(recipient);
+    console.log(recipient);
+  }
+  
+  
 
   return (
     <aside className={clsx(classes.chatWindowContainer, { [classes.hide]: !isChatWindowOpen })}>
-      <ChatWindowHeader />
+      <ChatWindowHeader
+        onRecipientChange = {handleRecipientChange} />
       <MessageList messages={messages} />
-      <ChatInput conversation={conversation!} isChatWindowOpen={isChatWindowOpen} />
+      <ChatInput conversation={conversation!} isChatWindowOpen={isChatWindowOpen} recipient={userRecipient}/>
     </aside>
   );
 }

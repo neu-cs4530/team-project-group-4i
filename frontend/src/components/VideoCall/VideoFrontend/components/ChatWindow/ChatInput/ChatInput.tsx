@@ -63,12 +63,13 @@ const useStyles = makeStyles(theme => ({
 interface ChatInputProps {
   conversation: TextConversation;
   isChatWindowOpen: boolean;
+  recipient: string;
 }
 
 const ALLOWED_FILE_TYPES =
   'audio/*, image/*, text/*, video/*, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document .xslx, .ppt, .pdf, .key, .svg, .csv';
 
-export default function ChatInput({ conversation, isChatWindowOpen }: ChatInputProps) {
+export default function ChatInput({ conversation, isChatWindowOpen, recipient }: ChatInputProps) {
   const classes = useStyles();
   const [messageBody, setMessageBody] = useState('');
   const [isSendingFile, setIsSendingFile] = useState(false);
@@ -108,7 +109,9 @@ export default function ChatInput({ conversation, isChatWindowOpen }: ChatInputP
 
   const handleSendMessage = (message: string) => {
     if (isValidMessage) {
-      conversation.sendMessage(message.trim());
+      // add toUser field to sendMessage and this has to change whenever the select option value changes
+      // const toUser = document.getElementById("dmSelection")!.value;
+      conversation.sendMessage(message.trim(), recipient);
       setMessageBody('');
     }
   };

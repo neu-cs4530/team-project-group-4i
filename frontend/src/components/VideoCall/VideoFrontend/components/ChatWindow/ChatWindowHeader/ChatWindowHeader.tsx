@@ -40,9 +40,9 @@ const useStyles = makeStyles(() =>
   const collator = new Intl.Collator('en', { numeric: true, sensitivity: 'base' });
   const sortedList = players.sort((player1, player2) => collator.compare(player1.userName, player2.userName));
   return sortedList;
-}
+ }
 
-export default function ChatWindowHeader() {
+export default function ChatWindowHeader({onRecipientChange}: any) {
   const classes = useStyles();
   const { setIsChatWindowOpen } = useChatContext();
   const { userName } = useCoveyAppState();
@@ -52,7 +52,10 @@ export default function ChatWindowHeader() {
   return (
     <div className={classes.container}>
       <div className={classes.text}>Chat</div>
-      <select>
+      <select id={"dmUser"} 
+              onChange = {(e) =>
+              onRecipientChange(e.target.value)}>
+        
         <option value={"Everyone"} selected>
           Everyone
         </option>
