@@ -42,6 +42,7 @@ const useStyles = makeStyles(() =>
   return sortedList;
  }
 
+ 
 export default function ChatWindowHeader({onRecipientChange}: any) {
   const classes = useStyles();
   const { setIsChatWindowOpen } = useChatContext();
