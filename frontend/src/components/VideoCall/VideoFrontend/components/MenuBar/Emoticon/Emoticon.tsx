@@ -14,7 +14,6 @@ export default function Emoticon() {
   const anchorRef = useRef<HTMLButtonElement>(null);
   const [statusEnabled, setStatus] = useState(false);
   const {apiClient, myPlayerID, currentTownID } = useCoveyAppState();
-  let selectedEmoticon: EmoticonTypes;
   const toast = useToast()
 
   const updateSelectedEmoticon = async (emoticon: string) => {
@@ -22,14 +21,14 @@ export default function Emoticon() {
       await apiClient.updatePlayerEmoticon({coveyTownID: currentTownID,
         myPlayerID: myPlayerID, emoticon: emoticon});
       toast({
-        title: 'Town deleted',
+        title: 'Emoticon updated.',
         status: 'success'
       })
       setStatusOpen(false);
     }catch(err){
       toast({
         title: 'Unable to update emoticon',
-        description: 'err.toString()', // TODO: this shouldnt b a string
+        description: err.toString(), // TODO: this shouldnt b a string
         status: 'error'
       });
     }
@@ -67,19 +66,19 @@ export default function Emoticon() {
         <MenuItem onClick={() => updateSelectedEmoticon(EmoticonTypes.SMILEY)}>
           <Typography >{EmoticonTypes.SMILEY}</Typography>
         </MenuItem>
-        <MenuItem onClick={() => setStatusOpen(false)}>
+        <MenuItem onClick={() => updateSelectedEmoticon(EmoticonTypes.FROWNY)}>
           <Typography>{EmoticonTypes.FROWNY}</Typography>
         </MenuItem>
-        <MenuItem onClick={() => setStatusOpen(false)}>
+        <MenuItem onClick={() => updateSelectedEmoticon(EmoticonTypes.EXTRAHAPPY)}>
           <Typography>{EmoticonTypes.EXTRAHAPPY}</Typography>
         </MenuItem>
-        <MenuItem onClick={() => setStatusOpen(false)}>
+        <MenuItem onClick={() => updateSelectedEmoticon(EmoticonTypes.WINKY)}>
           <Typography>{EmoticonTypes.WINKY}</Typography>
         </MenuItem>
-        <MenuItem onClick={() => setStatusOpen(false)}>
+        <MenuItem onClick={() => updateSelectedEmoticon(EmoticonTypes.COOL)}>
           <Typography>{EmoticonTypes.COOL}</Typography>
         </MenuItem>
-        <MenuItem onClick={() => setStatusOpen(false)}>
+        <MenuItem onClick={() => updateSelectedEmoticon(EmoticonTypes.SLANTY)}>
           <Typography>{EmoticonTypes.SLANTY}</Typography>
         </MenuItem>
       </MenuContainer>

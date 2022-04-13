@@ -4,6 +4,7 @@ import { Server } from 'http';
 import { StatusCodes } from 'http-status-codes';
 import {
   conversationAreaCreateHandler,
+  playerEmoticonUpdateHandler,
   townCreateHandler, townDeleteHandler,
   townJoinHandler,
   townListHandler,
@@ -114,6 +115,27 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
         coveyTownID: req.params.townID,
         sessionToken: req.body.sessionToken,
         conversationArea: req.body.conversationArea,
+      });
+      res.status(StatusCodes.OK)
+        .json(result);
+    } catch (err) {
+      logError(err);
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .json({
+          message: 'Internal server error, please see log in server for more details',
+        });
+    }
+  });
+
+  /**
+   * Update a player's emoticon.
+   */
+  app.patch('/players/:myPlayerID', express.json(), async (req, res) => {
+    try {
+      const result = playerEmoticonUpdateHandler({
+        coveyTownID: req.body.coveyTownID,
+        myPlayerID: req.params.myPlayerID,
+        emoticon: req.body.emoticon,
       });
       res.status(StatusCodes.OK)
         .json(result);
