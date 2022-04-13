@@ -28,7 +28,7 @@ export default function Emoticon() {
     }catch(err){
       toast({
         title: 'Unable to update emoticon',
-        description: err.toString(), // TODO: this shouldnt b a string
+        description: err.toString(),
         status: 'error'
       });
     }
