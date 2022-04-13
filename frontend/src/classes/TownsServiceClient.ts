@@ -2,7 +2,6 @@ import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import assert from 'assert';
 import { ServerPlayer } from './Player';
 import { ServerConversationArea } from './ConversationArea';
-import { EmoticonTypes } from '../components/VideoCall/VideoFrontend/components/MenuBar/Emoticon/EmoticonTypes';
 
 /**
  * The format of a request to join a Town in Covey.Town, as dispatched by the server middleware

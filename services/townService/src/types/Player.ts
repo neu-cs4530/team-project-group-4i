@@ -40,10 +40,6 @@ export default class Player {
     return this._id;
   }
 
-  // get emoticon(): string | undefined {
-  //   return this.emoticon;
-  // }
-
   get activeConversationArea(): ServerConversationArea | undefined {
     return this._activeConversationArea;
   }
