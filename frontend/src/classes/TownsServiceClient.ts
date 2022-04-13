@@ -2,6 +2,7 @@ import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import assert from 'assert';
 import { ServerPlayer } from './Player';
 import { ServerConversationArea } from './ConversationArea';
+import { EmoticonTypes } from '../components/VideoCall/VideoFrontend/components/MenuBar/Emoticon/EmoticonTypes';
 
 /**
  * The format of a request to join a Town in Covey.Town, as dispatched by the server middleware
@@ -79,6 +80,15 @@ export interface TownUpdateRequest {
   isPubliclyListed?: boolean;
 }
 
+/**
+ * Payload sent by the client to update a player's emoticon.
+ */
+export interface PlayerEmoticonUpdateRequest {
+  coveyTownID: string;
+  myPlayerID: string;
+  emoticon?: string;
+}
+
 export interface ConversationCreateRequest {
   coveyTownID: string;
   sessionToken: string;
@@ -138,6 +148,11 @@ export default class TownsServiceClient {
 
   async deleteTown(requestData: TownDeleteRequest): Promise<void> {
     const responseWrapper = await this._axios.delete<ResponseEnvelope<void>>(`/towns/${requestData.coveyTownID}/${requestData.coveyTownPassword}`);
+    return TownsServiceClient.unwrapOrThrowError(responseWrapper, true);
+  }
+
+  async updatePlayerEmoticon(requestData: PlayerEmoticonUpdateRequest): Promise<void> { // TODO: may need to update this endpt when status goes in
+    const responseWrapper = await this._axios.patch<ResponseEnvelope<void>>(`/towns/${requestData.myPlayerID}`, requestData);
     return TownsServiceClient.unwrapOrThrowError(responseWrapper, true);
   }
 

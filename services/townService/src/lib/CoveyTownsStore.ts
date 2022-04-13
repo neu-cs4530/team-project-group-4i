@@ -104,4 +104,17 @@ export default class CoveyTownsStore {
     return false;
   }
 
+  updatePlayerEmoticon(coveyTownID: string, myPlayerID: string, emoticon?: string): boolean {
+    const existingTown = this.getControllerForTown(coveyTownID);
+    if (existingTown) {
+      for (let i = 0; i < existingTown?.players.length; i += 1) {
+        if (existingTown.players[i].id === myPlayerID) {
+          existingTown.players[i].emoticon = emoticon;
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
 }
