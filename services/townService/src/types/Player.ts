@@ -9,6 +9,9 @@ export default class Player {
   /** The current location of this user in the world map * */
   public location: UserLocation;
 
+  /** The player's emoticon, if selected * */
+  public emoticon: string | undefined;
+
   /** The unique identifier for this player * */
   private readonly _id: string;
 

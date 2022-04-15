@@ -1,15 +1,38 @@
 import React, { useState, useRef } from 'react';
-
+import {
+  useToast
+} from '@chakra-ui/react';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { Button, useMediaQuery, Theme, Menu as MenuContainer, MenuItem, Typography } from '@material-ui/core';
 import { EmoticonTypes } from './EmoticonTypes';
+import useCoveyAppState from '../../../../../../hooks/useCoveyAppState';
 
 export default function Emoticon() {
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
   const [statusOpen, setStatusOpen] = useState(false);
   const anchorRef = useRef<HTMLButtonElement>(null);
   const [statusEnabled, setStatus] = useState(false);
+  const {apiClient, myPlayerID, currentTownID } = useCoveyAppState();
+  const toast = useToast()
+
+  const updateSelectedEmoticon = async (emoticon: string) => {
+    try{
+      await apiClient.updatePlayerEmoticon({coveyTownID: currentTownID,
+        myPlayerID: myPlayerID, emoticon: emoticon});
+      toast({
+        title: 'Emoticon updated.',
+        status: 'success'
+      })
+      setStatusOpen(false);
+    }catch(err){
+      toast({
+        title: 'Unable to update emoticon',
+        description: err.toString(),
+        status: 'error'
+      });
+    }
+  }
 
   return (
     <>
@@ -40,22 +63,22 @@ export default function Emoticon() {
           horizontal: 'center',
         }}
       >
-        <MenuItem onClick={() => setStatusOpen(false)}>
+        <MenuItem onClick={() => updateSelectedEmoticon(EmoticonTypes.SMILEY)}>
           <Typography >{EmoticonTypes.SMILEY}</Typography>
         </MenuItem>
-        <MenuItem onClick={() => setStatusOpen(false)}>
+        <MenuItem onClick={() => updateSelectedEmoticon(EmoticonTypes.FROWNY)}>
           <Typography>{EmoticonTypes.FROWNY}</Typography>
         </MenuItem>
-        <MenuItem onClick={() => setStatusOpen(false)}>
+        <MenuItem onClick={() => updateSelectedEmoticon(EmoticonTypes.EXTRAHAPPY)}>
           <Typography>{EmoticonTypes.EXTRAHAPPY}</Typography>
         </MenuItem>
-        <MenuItem onClick={() => setStatusOpen(false)}>
+        <MenuItem onClick={() => updateSelectedEmoticon(EmoticonTypes.WINKY)}>
           <Typography>{EmoticonTypes.WINKY}</Typography>
         </MenuItem>
-        <MenuItem onClick={() => setStatusOpen(false)}>
+        <MenuItem onClick={() => updateSelectedEmoticon(EmoticonTypes.COOL)}>
           <Typography>{EmoticonTypes.COOL}</Typography>
         </MenuItem>
-        <MenuItem onClick={() => setStatusOpen(false)}>
+        <MenuItem onClick={() => updateSelectedEmoticon(EmoticonTypes.SLANTY)}>
           <Typography>{EmoticonTypes.SLANTY}</Typography>
         </MenuItem>
       </MenuContainer>

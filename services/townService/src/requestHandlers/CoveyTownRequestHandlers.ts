@@ -83,6 +83,15 @@ export interface TownUpdateRequest {
 }
 
 /**
+ * Payload sent by the client to update a player's emoticon.
+ */
+export interface PlayerEmoticonUpdateRequest {
+  coveyTownID: string;
+  myPlayerID: string;
+  emoticon?: string;
+}
+
+/**
  * Envelope that wraps any response from the server
  */
 export interface ResponseEnvelope<T> {
@@ -173,6 +182,17 @@ export function townUpdateHandler(requestData: TownUpdateRequest): ResponseEnvel
 
 }
 
+export function playerEmoticonUpdateHandler(requestData: PlayerEmoticonUpdateRequest): ResponseEnvelope<Record<string, null>> {
+  const townsStore = CoveyTownsStore.getInstance();
+  const success = townsStore.updatePlayerEmoticon(requestData.coveyTownID, requestData.myPlayerID, requestData.emoticon);
+  return {
+    isOK: success,
+    response: {},
+    message: !success ? 'Invalid emoticon.' : undefined,
+  };
+
+}
+
 /**
  * A handler to process the "Create Conversation Area" request
  * The intended flow of this handler is:
@@ -254,8 +274,8 @@ export function townSubscriptionHandler(socket: Socket): void {
 
   // Create an adapter that will translate events from the CoveyTownController into
   // events that the socket protocol knows about
-  const listener = {coveyTownListener: townSocketAdapter(socket),
-                    playerUsername: s.player.userName};
+  const listener = { coveyTownListener: townSocketAdapter(socket),
+    playerUsername: s.player.userName };
   townController.addTownListener(listener);
 
   // Register an event listener for the client socket: if the client disconnects,

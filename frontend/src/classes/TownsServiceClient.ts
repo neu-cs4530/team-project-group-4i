@@ -79,6 +79,15 @@ export interface TownUpdateRequest {
   isPubliclyListed?: boolean;
 }
 
+/**
+ * Payload sent by the client to update a player's emoticon.
+ */
+export interface PlayerEmoticonUpdateRequest {
+  coveyTownID: string;
+  myPlayerID: string;
+  emoticon?: string;
+}
+
 export interface ConversationCreateRequest {
   coveyTownID: string;
   sessionToken: string;
@@ -138,6 +147,11 @@ export default class TownsServiceClient {
 
   async deleteTown(requestData: TownDeleteRequest): Promise<void> {
     const responseWrapper = await this._axios.delete<ResponseEnvelope<void>>(`/towns/${requestData.coveyTownID}/${requestData.coveyTownPassword}`);
+    return TownsServiceClient.unwrapOrThrowError(responseWrapper, true);
+  }
+
+  async updatePlayerEmoticon(requestData: PlayerEmoticonUpdateRequest): Promise<void> {
+    const responseWrapper = await this._axios.patch<ResponseEnvelope<void>>(`/players/${requestData.myPlayerID}`, requestData);
     return TownsServiceClient.unwrapOrThrowError(responseWrapper, true);
   }
 
