@@ -16,14 +16,14 @@ const useStyles = makeStyles({
     hyphens: 'auto',
     whiteSpace: 'pre-wrap',
   },
-  isLocalParticipant: {
+  isAuthorLocalParticipant: {
     backgroundColor: '#CCE4FF',
   },
 });
 
 interface TextMessageProps {
   body: string;
-  isLocalParticipant: boolean;
+  isAuthorLocalParticipant: boolean;
 }
 
 function addLinks(text: string) {
@@ -48,14 +48,14 @@ function addLinks(text: string) {
   return results;
 }
 
-export default function TextMessage({ body, isLocalParticipant }: TextMessageProps) {
+export default function TextMessage({ body, isAuthorLocalParticipant }: TextMessageProps) {
   const classes = useStyles();
 
   return (
     <div>
       <div
         className={clsx(classes.messageContainer, {
-          [classes.isLocalParticipant]: isLocalParticipant,
+          [classes.isAuthorLocalParticipant]: isAuthorLocalParticipant,
         })}
       >
         <div>{addLinks(body)}</div>
