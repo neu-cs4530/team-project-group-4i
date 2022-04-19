@@ -44,7 +44,6 @@ export default function ChatWindow() {
   
   const handleRecipientChange = (recipient: any) => {
     changeRecipient(recipient);
-    console.log(recipient);
   }
   
   
