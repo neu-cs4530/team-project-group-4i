@@ -1,7 +1,6 @@
 import { customAlphabet, nanoid } from 'nanoid';
 import { BoundingBox, ServerConversationArea } from '../client/TownsServiceClient';
 import { ChatMessage, UserLocation } from '../CoveyTypes';
-import CoveyTownListener from '../types/CoveyTownListener';
 import { PlayerCoveyTownListener } from '../types/PlayerCoveyTownListener';
 import Player from '../types/Player';
 import PlayerSession from '../types/PlayerSession';
@@ -247,7 +246,7 @@ export default class CoveyTownController {
   }
 
   onChatMessage(message: ChatMessage): void {
-    if (message.toUser === "Everyone") {
+    if (message.toUser === 'Everyone') {
       this._listeners.forEach(listener => listener.coveyTownListener.onChatMessage(message));
     } else {
       this._listeners.filter(listener => listener.playerUsername === message.toUser || 
