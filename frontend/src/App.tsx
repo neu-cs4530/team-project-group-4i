@@ -48,6 +48,7 @@ type CoveyAppUpdate =
         townIsPubliclyListed: boolean;
         sessionToken: string;
         myPlayerID: string;
+        myPlayerStatusMessage?: string;
         socket: Socket;
         emitMovement: (location: UserLocation) => void;
       };
@@ -74,6 +75,7 @@ function appStateReducer(state: CoveyAppState, update: CoveyAppUpdate): CoveyApp
     currentTownID: state.currentTownID,
     currentTownIsPubliclyListed: state.currentTownIsPubliclyListed,
     myPlayerID: state.myPlayerID,
+    myPlayerStatusMessage: state.myPlayerStatusMessage,
     userName: state.userName,
     socket: state.socket,
     emitMovement: state.emitMovement,
@@ -84,6 +86,7 @@ function appStateReducer(state: CoveyAppState, update: CoveyAppUpdate): CoveyApp
     case 'doConnect':
       nextState.sessionToken = update.data.sessionToken;
       nextState.myPlayerID = update.data.myPlayerID;
+      nextState.myPlayerStatusMessage = update.data.myPlayerStatusMessage;
       nextState.currentTownFriendlyName = update.data.townFriendlyName;
       nextState.currentTownID = update.data.townID;
       nextState.currentTownIsPubliclyListed = update.data.townIsPubliclyListed;
@@ -128,6 +131,9 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
   const [playerMovementCallbacks] = useState<PlayerMovementCallback[]>([]);
   const [playersInTown, setPlayersInTown] = useState<Player[]>([]);
   const [nearbyPlayers, setNearbyPlayers] = useState<Player[]>([]);
+  // tried imitating however playersInTown is used, but a list of the player status messages
+  // probably isn't necessary..
+  const [playersStatusMessages, setPlayersStatusMessages] = useState<(string | undefined)[]>([]);
   // const [currentLocation, setCurrentLocation] = useState<UserLocation>({moving: false, rotation: 'front', x: 0, y: 0});
   const [conversationAreas, setConversationAreas] = useState<ConversationArea[]>([]);
 
@@ -151,6 +157,7 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
       let currentLocation: UserLocation = { moving: false, rotation: 'front', x: 0, y: 0 };
 
       let localPlayers = initData.currentPlayers.map(sp => Player.fromServerPlayer(sp));
+      const localPlayersStatusMessages = initData.currentPlayers.map(sp => Player.fromServerPlayer(sp).statusMessage);
       let localConversationAreas = initData.conversationAreas.map(sa =>
         ConversationArea.fromServerConversationArea(sa),
       );
@@ -158,6 +165,7 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
       setPlayersInTown(localPlayers);
       setConversationAreas(localConversationAreas);
       setNearbyPlayers(localNearbyPlayers);
+      setPlayersStatusMessages(localPlayersStatusMessages);
 
       const recalculateNearbyPlayers = () => {
         const newNearbyPlayers = calculateNearbyPlayers(localPlayers, currentLocation);
@@ -185,6 +193,7 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
         localPlayers = localPlayers.concat(Player.fromServerPlayer(player));
         setPlayersInTown(localPlayers);
         recalculateNearbyPlayers();
+        setPlayersStatusMessages(localPlayers.map(p => p.statusMessage));
       });
       socket.on('playerMoved', (player: ServerPlayer) => {
         if (player._id !== gamePlayerID) {
@@ -206,8 +215,22 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
           }
         }
       });
+      socket.on('playerStatusChanged', (player: ServerPlayer) => {
+        const updatedPlayer = localPlayers.find(
+          p => p.id === player._id
+        );
+        if (updatedPlayer) {
+          updatedPlayer.statusMessage = player.statusMessage;
+        }
+        setPlayersStatusMessages(localPlayers.map(p => p.statusMessage));
+        // tried resetting players in town when this is called
+        setPlayersInTown(localPlayers);
+      });
       socket.on('playerDisconnect', (disconnectedPlayer: ServerPlayer) => {
         localPlayers = localPlayers.filter(player => player.id !== disconnectedPlayer._id);
+        localPlayersStatusMessages.forEach((status,index)=>{
+          if(status === disconnectedPlayer.statusMessage) localPlayersStatusMessages.splice(index,1);
+       });
         setPlayersInTown(localPlayers);
         recalculateNearbyPlayers();
       });

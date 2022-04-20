@@ -19,6 +19,8 @@ export type CoveyAppState = {
   currentTownID: string,
   currentTownIsPubliclyListed: boolean,
   myPlayerID: string,
+  // unsure if this is necessary, can ignore for now
+  myPlayerStatusMessage?: string,
   emitMovement: (location: UserLocation) => void,
   socket: Socket | null,
   apiClient: TownsServiceClient

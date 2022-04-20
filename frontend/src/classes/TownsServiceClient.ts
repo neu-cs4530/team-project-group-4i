@@ -88,6 +88,16 @@ export interface PlayerEmoticonUpdateRequest {
   emoticon?: string;
 }
 
+/**
+ * Payload sent by the client to update a player's status message.
+ */
+ export interface PlayerStatusMessageUpdateRequest {
+  coveyTownID: string;
+  myPlayerID: string;
+  statusMessage?: string;
+  sessionToken: string;
+}
+
 export interface ConversationCreateRequest {
   coveyTownID: string;
   sessionToken: string;
@@ -151,6 +161,11 @@ export default class TownsServiceClient {
   }
 
   async updatePlayerEmoticon(requestData: PlayerEmoticonUpdateRequest): Promise<void> {
+    const responseWrapper = await this._axios.patch<ResponseEnvelope<void>>(`/players/${requestData.myPlayerID}`, requestData);
+    return TownsServiceClient.unwrapOrThrowError(responseWrapper, true);
+  }
+
+  async updatePlayerStatusMessage(requestData: PlayerStatusMessageUpdateRequest): Promise<void> {
     const responseWrapper = await this._axios.patch<ResponseEnvelope<void>>(`/players/${requestData.myPlayerID}`, requestData);
     return TownsServiceClient.unwrapOrThrowError(responseWrapper, true);
   }

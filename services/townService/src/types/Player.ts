@@ -12,6 +12,9 @@ export default class Player {
   /** The player's emoticon, if selected * */
   public emoticon: string | undefined;
 
+  /** The player's status message, if selected * */
+  public statusMessage?: string;
+
   /** The unique identifier for this player * */
   private readonly _id: string;
 

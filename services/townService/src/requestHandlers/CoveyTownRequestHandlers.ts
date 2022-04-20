@@ -92,6 +92,16 @@ export interface PlayerEmoticonUpdateRequest {
 }
 
 /**
+ * Payload sent by the client to update a player's status message.
+ */
+ export interface PlayerStatusMessageUpdateRequest {
+  coveyTownID: string;
+  myPlayerID: string;
+  statusMessage?: string;
+  sessionToken: string;
+}
+
+/**
  * Envelope that wraps any response from the server
  */
 export interface ResponseEnvelope<T> {
@@ -193,6 +203,33 @@ export function playerEmoticonUpdateHandler(requestData: PlayerEmoticonUpdateReq
 
 }
 
+export function playerStatusMessageUpdateHandler(requestData: PlayerStatusMessageUpdateRequest): ResponseEnvelope<Record<string, null>> {
+  const townsStore = CoveyTownsStore.getInstance();
+  const townController = townsStore.getControllerForTown(requestData.coveyTownID);
+  if (!townController?.getSessionByToken(requestData.sessionToken)){
+    return {
+      isOK: false, response: {}, message: `Unable to update status message`,
+    };
+  }
+  
+  const player = townController.players.find(p => p.id === requestData.myPlayerID);
+  if (!player) {
+    return {
+      isOK: false, response: {}, message: `Unable to update status message`,
+    };
+  }
+
+  // called this method on the townController instead of townStore to try to imitate how 
+  // conversation area topic is updated
+  const success = townController.updatePlayerStatusMessage(player, requestData.statusMessage);
+  
+  return {
+    isOK: success,
+    response: {},
+    message: !success ? `Unable to update status message` : undefined,
+  };
+}
+
 /**
  * A handler to process the "Create Conversation Area" request
  * The intended flow of this handler is:
@@ -228,6 +265,9 @@ function townSocketAdapter(socket: Socket): CoveyTownListener {
   return {
     onPlayerMoved(movedPlayer: Player) {
       socket.emit('playerMoved', movedPlayer);
+    },
+    onPlayerStatusChanged(changedStatusPlayer: Player) {
+      socket.emit('playerStatusChanged', changedStatusPlayer);
     },
     onPlayerDisconnected(removedPlayer: Player) {
       socket.emit('playerDisconnect', removedPlayer);
