@@ -41,10 +41,10 @@ export default function ChatWindowHeader({onRecipientChange}: any) {
   return (
     <div className={classes.container}>
       <div className={classes.text}>Chat</div>
-      <select onChange = {(e) =>
-              onRecipientChange(e.target.value)}>
-        
-        <option value={"Everyone"} selected>
+      <select onChange={(e) =>
+        onRecipientChange(e.target.value)}
+        defaultValue={'Everyone'}>
+        <option value={'Everyone'} disabled>
           Everyone
         </option>
         {
