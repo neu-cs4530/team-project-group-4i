@@ -281,6 +281,7 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
       setPlayersInTown,
       setNearbyPlayers,
       setConversationAreas,
+      setPlayersStatusMessages
     ],
   );
   const videoInstance = Video.instance();

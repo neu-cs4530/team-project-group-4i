@@ -205,6 +205,15 @@ export function playerEmoticonUpdateHandler(requestData: PlayerEmoticonUpdateReq
 
 export function playerStatusMessageUpdateHandler(requestData: PlayerStatusMessageUpdateRequest): ResponseEnvelope<Record<string, null>> {
   const townsStore = CoveyTownsStore.getInstance();
+  const success = townsStore.updatePlayerStatusMessage(requestData.coveyTownID, requestData.myPlayerID, requestData.statusMessage);
+  return {
+    isOK: success,
+    response: {},
+    message: !success ? 'Invalid status message.' : undefined,
+  };
+  /*
+  console.log('requesthandler');
+  // const townsStore = CoveyTownsStore.getInstance();
   const townController = townsStore.getControllerForTown(requestData.coveyTownID);
   if (!townController?.getSessionByToken(requestData.sessionToken)){
     return {
@@ -212,22 +221,22 @@ export function playerStatusMessageUpdateHandler(requestData: PlayerStatusMessag
     };
   }
   
-  const player = townController.players.find(p => p.id === requestData.myPlayerID);
-  if (!player) {
+  // const player = townController.players.find(p => p.id === requestData.myPlayerID);
+  // if (!player) {
     return {
       isOK: false, response: {}, message: `Unable to update status message`,
     };
-  }
+  // }
 
   // called this method on the townController instead of townStore to try to imitate how 
   // conversation area topic is updated
-  const success = townController.updatePlayerStatusMessage(player, requestData.statusMessage);
+  // const success = townController.updatePlayerStatusMessage(player, requestData.statusMessage);
   
   return {
     isOK: success,
     response: {},
     message: !success ? `Unable to update status message` : undefined,
-  };
+  }; */
 }
 
 /**
@@ -267,6 +276,7 @@ function townSocketAdapter(socket: Socket): CoveyTownListener {
       socket.emit('playerMoved', movedPlayer);
     },
     onPlayerStatusChanged(changedStatusPlayer: Player) {
+      // console.log('requesthandler');
       socket.emit('playerStatusChanged', changedStatusPlayer);
     },
     onPlayerDisconnected(removedPlayer: Player) {
@@ -325,6 +335,11 @@ export function townSubscriptionHandler(socket: Socket): void {
     townController.removeTownListener(listener);
     townController.destroySession(s);
   });
+
+  // second time updatePlayerStatusMessage is called, this is unnecessary?
+  socket.on('playerStatusChanged', (changedStatusPlayer: Player) => {
+    townController.updatePlayerStatusMessage(changedStatusPlayer, changedStatusPlayer.statusMessage);
+  })
 
   socket.on('chatMessage', (message: ChatMessage) => { townController.onChatMessage(message); });
 

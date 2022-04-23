@@ -31,6 +31,8 @@ class CoveyGameScene extends Phaser.Scene {
 
   private myPlayerID: string;
 
+  private myPlayer?: Player;
+
   private players: Player[] = [];
 
   private conversationAreas: ConversationGameObjects[] = [];
@@ -143,6 +145,7 @@ class CoveyGameScene extends Phaser.Scene {
         eachArea.conversationArea = undefined;
       }
     });
+    // this.updatePlayersStatus(this.players);
   }
 
   updatePlayersLocations(players: Player[]) {
@@ -218,10 +221,8 @@ class CoveyGameScene extends Phaser.Scene {
       sprite.setY(player.location.y);
       myPlayer.label?.setX(player.location.x);
       myPlayer.label?.setY(player.location.y - 20);
-      if (myPlayer.statusMessage) {
-        myPlayer.statusLabel?.setX(player.location.x);
-        myPlayer.statusLabel?.setY(player.location.y - 40);
-      }
+      myPlayer.statusLabel?.setX(player.location.x);
+      myPlayer.statusLabel?.setY(player.location.y - 40);
       if (player.location.moving) {
         sprite.anims.play(`misa-${player.location.rotation}-walk`, true);
       } else {
@@ -232,10 +233,6 @@ class CoveyGameScene extends Phaser.Scene {
   }
 
   updatePlayersStatus(players: Player[]) {
-    if (!this.ready) {
-      this.players = players;
-      return;
-    }
     players.forEach(p => {
       this.updatePlayerStatus(p);
     });
@@ -256,15 +253,14 @@ class CoveyGameScene extends Phaser.Scene {
       myPlayer = new Player(player.id, player.userName, location, player.statusMessage);
       this.players.push(myPlayer);
     }
-    if (this.myPlayerID !== myPlayer.id && this.physics && player.location) {
+    if (this.physics && player.location) {
       const { sprite } = myPlayer;
       if (!sprite || !sprite.anims) return;
       // needs to call some player status update, handles whatever given option
       const updateListener = {
         onStatusChange: (newStatus: string | undefined) => {
-          if (newStatus && myPlayer && this.player) {
+          if (newStatus && myPlayer) {
             if (myPlayer.statusLabel) {
-              
               myPlayer.statusLabel.text = newStatus;
             } else {
               const statusLabel = this.add.text(0, 0, newStatus, {
@@ -272,50 +268,36 @@ class CoveyGameScene extends Phaser.Scene {
                 color: '#000000',
                 backgroundColor: '#ffffff',
               });
+              myPlayer.statusLabel = statusLabel;
               // this.player.statusLabel = statusLabel;
               // this.player.statusLabel.text = newStatus;
-              myPlayer.statusLabel = statusLabel;
               myPlayer.statusMessage = newStatus;
             }
-          } else if (myPlayer && this.player && myPlayer.statusLabel) {
+          } else if (myPlayer && myPlayer.statusLabel && !newStatus) {
             myPlayer.statusLabel.text = '';
             // this.player.statusLabel.text = '';
           }
-          else if (myPlayer && this.player) {
+          else if (myPlayer && this.player && !newStatus) {
             const statusLabel = this.add.text(0, 0, '', {
               font: '18px monospace',
               color: '#000000',
               backgroundColor: '#ffffff',
             });
             myPlayer.statusLabel = statusLabel;
+            myPlayer.statusMessage = '';
             // this.player.statusLabel.text = '';
+          }
+          if (player.id === this.myPlayerID) {
+            this.update();
           }
         },
       };
       myPlayer.addListener(updateListener);
       updateListener.onStatusChange(player.statusMessage);
-      // console.log(myPlayer.statusLabel?.text);
       myPlayer.label?.setX(player.location.x);
       myPlayer.label?.setY(player.location.y - 20);
-      if (myPlayer.statusMessage) {
-        myPlayer.statusLabel?.setX(player.location.x);
-        myPlayer.statusLabel?.setY(player.location.y - 40);
-      }
-    }
-    if (myPlayer.id === this.myPlayerID) {
-      if (this.currentStatusLabel) {
-        if (myPlayer.statusMessage) {
-          this.currentStatusLabel.text = myPlayer.statusMessage
-        } else {
-          this.currentStatusLabel.text = '';
-        }
-      } else {
-        this.currentStatusLabel = this.add.text(0, 0, '', {
-          font: '18px monospace',
-          color: '#000000',
-          backgroundColor: '#ffffff',
-        });
-      }
+      myPlayer.statusLabel?.setX(player.location.x);
+      myPlayer.statusLabel?.setY(player.location.y - 40);
     }
   }
 
@@ -386,13 +368,51 @@ class CoveyGameScene extends Phaser.Scene {
       const isMoving = primaryDirection !== undefined;
       this.player.label.setX(body.x);
       this.player.label.setY(body.y - 20);
+      if (this.currentStatusLabel) {
+        // this.player.statusLabel.text = 'my status';
+        // this is what updates the label text, unsure how to get current status label accurately
+        this.player.statusLabel.text = this.currentStatusLabel.text;
+      }
+      const updateListener = {
+        onStatusChange: (newStatus: string | undefined) => {
+          if (newStatus && this.myPlayer) {
+            if (this.player) {
+              this.player.statusLabel.text = newStatus;
+            } else {
+              const statusLabel = this.add.text(0, 0, newStatus, {
+                font: '18px monospace',
+                color: '#000000',
+                backgroundColor: '#ffffff',
+              });
+              this.myPlayer.statusLabel = statusLabel;
+              // this.player.statusLabel = statusLabel;
+              // this.player.statusLabel.text = newStatus;
+              this.myPlayer.statusMessage = newStatus;
+            }
+          } else if (this.player && this.player.statusLabel && !newStatus) {
+            this.player.statusLabel.text = '';
+            // this.player.statusLabel.text = '';
+          }
+          else if (this.player && !newStatus) {
+            const statusLabel = this.add.text(0, 0, '', {
+              font: '18px monospace',
+              color: '#000000',
+              backgroundColor: '#ffffff',
+            });
+            this.player.statusLabel = statusLabel;
+            if (this.myPlayer) {
+              this.myPlayer.statusMessage = '';
+            }
+            // this.player.statusLabel.text = '';
+          }
+        }
+      }
+      if (this.myPlayer) {
+        this.myPlayer.addListener(updateListener);
+        updateListener.onStatusChange(this.myPlayer.statusMessage);
+      }
       this.player.statusLabel?.setX(body.x);
       this.player.statusLabel?.setY(body.y - 40);
-      if (this.currentStatusLabel) {
-        // this.player.statusLabel.text = this.currentStatusLabel.text;
-        // this is what updates the label text, unsure how to get current status label accurately
-        this.player.statusLabel.text = String(body.x);
-      }
       if (
         !this.lastLocation ||
         this.lastLocation.x !== body.x ||
@@ -425,6 +445,13 @@ class CoveyGameScene extends Phaser.Scene {
             this.infoTextBox?.setVisible(false);
             this.currentConversationArea = undefined;
             this.lastLocation.conversationLabel = undefined;
+          }
+        }
+        if (this.myPlayer?.statusMessage !== this.player.statusLabel.text) {
+          if (this.myPlayer?.statusMessage) {
+            this.player.statusLabel.text = this.myPlayer?.statusMessage;
+          } else {
+            this.player.statusLabel.text = '';
           }
         }
         this.emitMovement(this.lastLocation);
@@ -538,12 +565,6 @@ class CoveyGameScene extends Phaser.Scene {
       .setDepth(30);
     this.infoTextBox.setVisible(false);
     this.infoTextBox.x = this.game.scale.width / 2 - this.infoTextBox.width / 2;
-    
-    this.currentStatusLabel = this.add.text(0, 0, '', {
-      font: '18px monospace',
-      color: '#000000',
-      backgroundColor: '#ffffff',
-    });
 
     const labels = map.filterObjects('Objects', obj => obj.name === 'label');
     labels.forEach(label => {
@@ -580,6 +601,11 @@ class CoveyGameScene extends Phaser.Scene {
       ) as Phaser.Types.Input.Keyboard.CursorKeys,
     );
 
+    this.currentStatusLabel = this.add.text(0, 0, '', {
+      font: '18px monospace',
+      color: '#000000',
+      backgroundColor: '#ffffff',
+    });
     // Create a sprite with physics enabled via the physics system. The image used for the sprite
     // has a bit of whitespace, so I'm using setSize & setOffset to control the size of the
     // player's body.
@@ -593,7 +619,7 @@ class CoveyGameScene extends Phaser.Scene {
       // padding: {x: 20, y: 10},
       backgroundColor: '#ffffff',
     });
-    const statusLabel = this.add.text(0, 0, '', {
+    const statusLabel = this.add.text(spawnPoint.x, spawnPoint.y - 40, '', {
       font: '18px monospace',
       color: '#000000',
       backgroundColor: '#ffffff',
@@ -744,6 +770,13 @@ class CoveyGameScene extends Phaser.Scene {
       // sprites....
       this.players.forEach(p => this.updatePlayerLocation(p));
     }
+    this.myPlayer = new Player(this.myPlayerID, '(You)', {
+      rotation: 'front',
+      moving: false,
+      x: spawnPoint.x,
+      y: spawnPoint.y,
+    });
+    this.players.push(this.myPlayer);
     // Call any listeners that are waiting for the game to be initialized
     this._onGameReadyListeners.forEach(listener => listener());
     this._onGameReadyListeners = [];
@@ -823,6 +856,8 @@ export default function WorldMap(): JSX.Element {
   useEffect(() => {
     const movementDispatcher = (player: ServerPlayer) => {
       gameScene?.updatePlayerLocation(Player.fromServerPlayer(player));
+      // forcing status updates for now
+      gameScene?.updatePlayerStatus(Player.fromServerPlayer(player));
     };
     playerMovementCallbacks.push(movementDispatcher);
     return () => {
@@ -836,11 +871,12 @@ export default function WorldMap(): JSX.Element {
 
   useEffect(() => {
     gameScene?.updatePlayersStatus(players);
-  }, [ players, statusMessages, gameScene ]);
+  }, [gameScene, players, statusMessages]);
 
   useEffect(() => {
     gameScene?.updateConversationAreas(conversationAreas);
   }, [conversationAreas, gameScene]);
+
 
   const newConversationModalOpen = newConversation !== undefined;
   useEffect(() => {

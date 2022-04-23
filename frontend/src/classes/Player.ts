@@ -22,7 +22,7 @@ export default class Player {
     this._id = id;
     this._userName = userName;
     this.location = location;
-    this.statusMessage = statusMessage;
+    this._statusMessage = statusMessage;
   }
 
   get userName(): string {

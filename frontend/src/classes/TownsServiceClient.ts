@@ -161,12 +161,12 @@ export default class TownsServiceClient {
   }
 
   async updatePlayerEmoticon(requestData: PlayerEmoticonUpdateRequest): Promise<void> {
-    const responseWrapper = await this._axios.patch<ResponseEnvelope<void>>(`/players/${requestData.myPlayerID}`, requestData);
+    const responseWrapper = await this._axios.patch<ResponseEnvelope<void>>(`/players/${requestData.myPlayerID}/emoticon`, requestData);
     return TownsServiceClient.unwrapOrThrowError(responseWrapper, true);
   }
 
   async updatePlayerStatusMessage(requestData: PlayerStatusMessageUpdateRequest): Promise<void> {
-    const responseWrapper = await this._axios.patch<ResponseEnvelope<void>>(`/players/${requestData.myPlayerID}`, requestData);
+    const responseWrapper = await this._axios.patch<ResponseEnvelope<void>>(`/players/${requestData.myPlayerID}/status`, requestData);
     return TownsServiceClient.unwrapOrThrowError(responseWrapper, true);
   }
 

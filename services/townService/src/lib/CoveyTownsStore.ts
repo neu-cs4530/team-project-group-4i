@@ -130,6 +130,7 @@ export default class CoveyTownsStore {
       for (let i = 0; i < existingTown?.players.length; i += 1) {
         if (existingTown.players[i].id === myPlayerID) {
           existingTown.players[i].statusMessage = statusMessage;
+          existingTown.updatePlayerStatusMessage(existingTown.players[i], statusMessage);
           return true;
         }
       }
