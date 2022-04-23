@@ -1,7 +1,6 @@
 import { customAlphabet, nanoid } from 'nanoid';
 import { BoundingBox, ServerConversationArea } from '../client/TownsServiceClient';
 import { ChatMessage, UserLocation } from '../CoveyTypes';
-import CoveyTownListener from '../types/CoveyTownListener';
 import { PlayerCoveyTownListener } from '../types/PlayerCoveyTownListener';
 import Player from '../types/Player';
 import PlayerSession from '../types/PlayerSession';
@@ -166,6 +165,12 @@ export default class CoveyTownController {
     return true;
   }
 
+  updatePlayerEmoticon(player: Player, emoticon?: string): boolean {
+    player.emoticon = emoticon;
+    this._listeners.forEach(listener => listener.coveyTownListener.onPlayerEmoticonUpdated(player));
+    return true;
+  }
+
   /**
    * Removes a player from a conversation area, updating the conversation area's occupants list, 
    * and emitting the appropriate message (area updated or area destroyed)
@@ -256,7 +261,7 @@ export default class CoveyTownController {
   }
 
   onChatMessage(message: ChatMessage): void {
-    if (message.toUser === "Everyone") {
+    if (message.toUser === 'Everyone') {
       this._listeners.forEach(listener => listener.coveyTownListener.onChatMessage(message));
     } else {
       this._listeners.filter(listener => listener.playerUsername === message.toUser || 

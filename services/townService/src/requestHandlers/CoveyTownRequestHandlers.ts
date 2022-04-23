@@ -94,7 +94,7 @@ export interface PlayerEmoticonUpdateRequest {
 /**
  * Payload sent by the client to update a player's status message.
  */
- export interface PlayerStatusMessageUpdateRequest {
+export interface PlayerStatusMessageUpdateRequest {
   coveyTownID: string;
   myPlayerID: string;
   statusMessage?: string;
@@ -275,6 +275,9 @@ function townSocketAdapter(socket: Socket): CoveyTownListener {
     onPlayerMoved(movedPlayer: Player) {
       socket.emit('playerMoved', movedPlayer);
     },
+    onPlayerEmoticonUpdated(changedEmoticonPlayer: Player) {
+      socket.emit('playerEmoticonUpdated', changedEmoticonPlayer);
+    },
     onPlayerStatusChanged(changedStatusPlayer: Player) {
       // console.log('requesthandler');
       socket.emit('playerStatusChanged', changedStatusPlayer);
@@ -339,7 +342,11 @@ export function townSubscriptionHandler(socket: Socket): void {
   // second time updatePlayerStatusMessage is called, this is unnecessary?
   socket.on('playerStatusChanged', (changedStatusPlayer: Player) => {
     townController.updatePlayerStatusMessage(changedStatusPlayer, changedStatusPlayer.statusMessage);
-  })
+  });
+
+  socket.on('playerEmoticonUpdated', (changedEmoticonPlayer: Player) => {
+    townController.updatePlayerEmoticon(changedEmoticonPlayer, changedEmoticonPlayer.emoticon);
+  });
 
   socket.on('chatMessage', (message: ChatMessage) => { townController.onChatMessage(message); });
 

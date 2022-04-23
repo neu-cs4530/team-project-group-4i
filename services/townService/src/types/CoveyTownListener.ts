@@ -25,6 +25,12 @@ export default interface CoveyTownListener {
   onPlayerStatusChanged(changedStatusPlayer: Player): void;
 
   /**
+   * Called when a player's emoticon changes
+   * @param changedEmoticonPlayer the player that changed their emoticon 
+   */
+  onPlayerEmoticonUpdated(changedEmoticonPlayer: Player): void;
+
+  /**
    * Called when a player disconnects from the town
    * @param removedPlayer the player that disconnected
    */
