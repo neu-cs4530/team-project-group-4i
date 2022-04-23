@@ -110,6 +110,7 @@ export default class CoveyTownsStore {
       for (let i = 0; i < existingTown?.players.length; i += 1) {
         if (existingTown.players[i].id === myPlayerID) {
           existingTown.players[i].emoticon = emoticon;
+          existingTown.updatePlayerEmoticon(existingTown.players[i], emoticon);
           return true;
         }
       }

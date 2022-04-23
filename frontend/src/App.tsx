@@ -49,6 +49,7 @@ type CoveyAppUpdate =
         sessionToken: string;
         myPlayerID: string;
         myPlayerStatusMessage?: string;
+        myPlayerEmoticon?: string;
         socket: Socket;
         emitMovement: (location: UserLocation) => void;
       };
@@ -76,6 +77,7 @@ function appStateReducer(state: CoveyAppState, update: CoveyAppUpdate): CoveyApp
     currentTownIsPubliclyListed: state.currentTownIsPubliclyListed,
     myPlayerID: state.myPlayerID,
     myPlayerStatusMessage: state.myPlayerStatusMessage,
+    myPlayerEmoticon: state.myPlayerEmoticon,
     userName: state.userName,
     socket: state.socket,
     emitMovement: state.emitMovement,
@@ -87,6 +89,7 @@ function appStateReducer(state: CoveyAppState, update: CoveyAppUpdate): CoveyApp
       nextState.sessionToken = update.data.sessionToken;
       nextState.myPlayerID = update.data.myPlayerID;
       nextState.myPlayerStatusMessage = update.data.myPlayerStatusMessage;
+      nextState.myPlayerEmoticon = update.data.myPlayerEmoticon;
       nextState.currentTownFriendlyName = update.data.townFriendlyName;
       nextState.currentTownID = update.data.townID;
       nextState.currentTownIsPubliclyListed = update.data.townIsPubliclyListed;
@@ -134,6 +137,7 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
   // tried imitating however playersInTown is used, but a list of the player status messages
   // probably isn't necessary..
   const [playersStatusMessages, setPlayersStatusMessages] = useState<(string | undefined)[]>([]);
+  const [playersEmoticons, setPlayersEmoticons] = useState<(string | undefined)[]>([]);
   // const [currentLocation, setCurrentLocation] = useState<UserLocation>({moving: false, rotation: 'front', x: 0, y: 0});
   const [conversationAreas, setConversationAreas] = useState<ConversationArea[]>([]);
 
@@ -158,6 +162,7 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
 
       let localPlayers = initData.currentPlayers.map(sp => Player.fromServerPlayer(sp));
       const localPlayersStatusMessages = initData.currentPlayers.map(sp => Player.fromServerPlayer(sp).statusMessage);
+      const localPlayersEmoticons = initData.currentPlayers.map(sp => Player.fromServerPlayer(sp).emoticon);
       let localConversationAreas = initData.conversationAreas.map(sa =>
         ConversationArea.fromServerConversationArea(sa),
       );
@@ -166,6 +171,7 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
       setConversationAreas(localConversationAreas);
       setNearbyPlayers(localNearbyPlayers);
       setPlayersStatusMessages(localPlayersStatusMessages);
+      setPlayersEmoticons(localPlayersEmoticons);
 
       const recalculateNearbyPlayers = () => {
         const newNearbyPlayers = calculateNearbyPlayers(localPlayers, currentLocation);
@@ -194,6 +200,7 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
         setPlayersInTown(localPlayers);
         recalculateNearbyPlayers();
         setPlayersStatusMessages(localPlayers.map(p => p.statusMessage));
+        setPlayersEmoticons(localPlayers.map(p => p.emoticon));
       });
       socket.on('playerMoved', (player: ServerPlayer) => {
         if (player._id !== gamePlayerID) {
@@ -226,11 +233,24 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
         // tried resetting players in town when this is called
         setPlayersInTown(localPlayers);
       });
+      socket.on('playerEmoticonUpdated', (player: ServerPlayer) => { // TODO: function name
+        const updatedPlayer = localPlayers.find(
+          p => p.id === player._id
+        );
+        if (updatedPlayer) {
+          updatedPlayer.emoticon = player.emoticon;
+        }
+        setPlayersEmoticons(localPlayers.map(p => p.emoticon));
+        setPlayersInTown(localPlayers);
+      });
       socket.on('playerDisconnect', (disconnectedPlayer: ServerPlayer) => {
         localPlayers = localPlayers.filter(player => player.id !== disconnectedPlayer._id);
         localPlayersStatusMessages.forEach((status,index)=>{
           if(status === disconnectedPlayer.statusMessage) localPlayersStatusMessages.splice(index,1);
-       });
+        });
+        localPlayersEmoticons.forEach((emoticon,index)=>{
+          if(emoticon === disconnectedPlayer.emoticon) localPlayersEmoticons.splice(index,1);
+        });
         setPlayersInTown(localPlayers);
         recalculateNearbyPlayers();
       });
@@ -281,7 +301,8 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
       setPlayersInTown,
       setNearbyPlayers,
       setConversationAreas,
-      setPlayersStatusMessages
+      setPlayersStatusMessages,
+      setPlayersEmoticons
     ],
   );
   const videoInstance = Video.instance();

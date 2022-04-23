@@ -21,6 +21,7 @@ export type CoveyAppState = {
   myPlayerID: string,
   // unsure if this is necessary, can ignore for now
   myPlayerStatusMessage?: string,
+  myPlayerEmoticon?: string,
   emitMovement: (location: UserLocation) => void,
   socket: Socket | null,
   apiClient: TownsServiceClient

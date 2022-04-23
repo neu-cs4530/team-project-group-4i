@@ -27,6 +27,7 @@ class CoveyGameScene extends Phaser.Scene {
     sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
     label: Phaser.GameObjects.Text;
     statusLabel: Phaser.GameObjects.Text;
+    emoticonLabel: Phaser.GameObjects.Text;
   };
 
   private myPlayerID: string;
@@ -61,6 +62,8 @@ class CoveyGameScene extends Phaser.Scene {
   // tried somehow imitating currentConversationArea, not sure how to update this consistently with
   // new text
   private currentStatusLabel?: Phaser.GameObjects.Text;
+
+  private currentEmoticonLabel?: Phaser.GameObjects.Text;
 
   private infoTextBox?: Phaser.GameObjects.Text;
 
@@ -157,6 +160,7 @@ class CoveyGameScene extends Phaser.Scene {
       this.updatePlayerLocation(p);
     });
     this.updatePlayersStatus(players);
+    this.updatePlayersEmoticon(players);
     // Remove disconnected players from board
     const disconnectedPlayers = this.players.filter(
       player => !players.find(p => p.id === player.id),
@@ -166,6 +170,7 @@ class CoveyGameScene extends Phaser.Scene {
         disconnectedPlayer.sprite.destroy();
         disconnectedPlayer.label?.destroy();
         disconnectedPlayer.statusLabel?.destroy();
+        disconnectedPlayer.emoticonLabel?.destroy();
       }
     });
     // Remove disconnected players from list
@@ -188,7 +193,7 @@ class CoveyGameScene extends Phaser.Scene {
           y: 0,
         };
       }
-      myPlayer = new Player(player.id, player.userName, location, player.statusMessage);
+      myPlayer = new Player(player.id, player.userName, location, player.statusMessage, player.emoticon);
       this.players.push(myPlayer);
     }
     if (this.myPlayerID !== myPlayer.id && this.physics && player.location) {
@@ -212,6 +217,14 @@ class CoveyGameScene extends Phaser.Scene {
             backgroundColor: '#ffffff',
           });
           myPlayer.statusLabel = statusLabel;
+        }
+        if (myPlayer.emoticon) {
+          const emoticonLabel = this.add.text(0, 0, myPlayer.emoticon, {
+            font: '18px monospace',
+            color: '#000000',
+            backgroundColor: '#ffffff',
+          });
+          myPlayer.emoticonLabel = emoticonLabel;
         }
         myPlayer.label = label;
         myPlayer.sprite = sprite;
@@ -301,6 +314,70 @@ class CoveyGameScene extends Phaser.Scene {
     }
   }
 
+  updatePlayersEmoticon(players: Player[]) {
+    players.forEach(p => {
+      this.updatePlayerEmoticon(p);
+    });
+  }
+
+  updatePlayerEmoticon(player: Player) {
+    let myPlayer = this.players.find(p => p.id === player.id);
+    if (!myPlayer) {
+      let { location } = player;
+      if (!location) {
+        location = {
+          rotation: 'back',
+          moving: false,
+          x: 0,
+          y: 0,
+        };
+      }
+      myPlayer = new Player(player.id, player.userName, location, player.statusMessage, player.emoticon);
+      this.players.push(myPlayer);
+    }
+    if (this.physics && player.location) {
+      const { sprite } = myPlayer;
+      if (!sprite || !sprite.anims) return;
+      const updateListener = {
+        onEmoticonChange: (newEmoticon: string | undefined) => {
+          if (newEmoticon && myPlayer) {
+            if (myPlayer.emoticonLabel) {
+              myPlayer.emoticonLabel.text = newEmoticon;
+            } else {
+              const emoticonLabel = this.add.text(0, 0, newEmoticon, {
+                font: '18px monospace',
+                color: '#000000',
+                backgroundColor: '#ffffff',
+              });
+              myPlayer.emoticonLabel = emoticonLabel;
+              myPlayer.emoticon = newEmoticon;
+            }
+          } else if (myPlayer && myPlayer.emoticonLabel && !newEmoticon) {
+            myPlayer.emoticonLabel.text = '';
+          }
+          else if (myPlayer && this.player && !newEmoticon) {
+            const emoticonLabel = this.add.text(0, 0, '', {
+              font: '18px monospace',
+              color: '#000000',
+              backgroundColor: '#ffffff',
+            });
+            myPlayer.emoticonLabel = emoticonLabel;
+            myPlayer.emoticon = '';
+          }
+          if (player.id === this.myPlayerID) {
+            this.update();
+          }
+        },
+      };
+      myPlayer.addListener(updateListener);
+      updateListener.onEmoticonChange(player.emoticon);
+      myPlayer.label?.setX(player.location.x);
+      myPlayer.label?.setY(player.location.y - 20);
+      myPlayer.emoticonLabel?.setX(player.location.x);
+      myPlayer.emoticonLabel?.setY(player.location.y - 60); // TODO: this spacing may be weird
+    }
+  }
+
   getNewMovementDirection() {
     if (this.cursors.find(keySet => keySet.left?.isDown)) {
       return 'left';
@@ -373,6 +450,9 @@ class CoveyGameScene extends Phaser.Scene {
         // this is what updates the label text, unsure how to get current status label accurately
         this.player.statusLabel.text = this.currentStatusLabel.text;
       }
+      if (this.currentEmoticonLabel) {
+        this.player.emoticonLabel.text = this.currentEmoticonLabel.text;
+      }
       const updateListener = {
         onStatusChange: (newStatus: string | undefined) => {
           if (newStatus && this.myPlayer) {
@@ -405,14 +485,45 @@ class CoveyGameScene extends Phaser.Scene {
             }
             // this.player.statusLabel.text = '';
           }
+        },
+        onEmoticonChange: (newEmoticon: string | undefined) => { // TODO: sus
+          if (newEmoticon && this.myPlayer) {
+            if (this.player) {
+              this.player.emoticonLabel.text = newEmoticon;
+            } else {
+              const emoticonLabel = this.add.text(0, 0, newEmoticon, {
+                font: '18px monospace',
+                color: '#000000',
+                backgroundColor: '#ffffff',
+              });
+              this.myPlayer.emoticonLabel = emoticonLabel;
+              this.myPlayer.emoticon = newEmoticon;
+            }
+          } else if (this.player && this.player.emoticonLabel && !newEmoticon) {
+            this.player.emoticonLabel.text = '';
+          }
+          else if (this.player && !newEmoticon) {
+            const emoticonLabel = this.add.text(0, 0, '', {
+              font: '18px monospace',
+              color: '#000000',
+              backgroundColor: '#ffffff',
+            });
+            this.player.emoticonLabel = emoticonLabel;
+            if (this.myPlayer) {
+              this.myPlayer.emoticon = '';
+            }
+          }
         }
       }
       if (this.myPlayer) {
         this.myPlayer.addListener(updateListener);
         updateListener.onStatusChange(this.myPlayer.statusMessage);
+        updateListener.onEmoticonChange(this.myPlayer.emoticon);
       }
       this.player.statusLabel?.setX(body.x);
       this.player.statusLabel?.setY(body.y - 40);
+      this.player.emoticonLabel?.setX(body.x);
+      this.player.emoticonLabel?.setY(body.y - 60); // TODO spacing
       if (
         !this.lastLocation ||
         this.lastLocation.x !== body.x ||
@@ -452,6 +563,13 @@ class CoveyGameScene extends Phaser.Scene {
             this.player.statusLabel.text = this.myPlayer?.statusMessage;
           } else {
             this.player.statusLabel.text = '';
+          }
+        }
+        if (this.myPlayer?.emoticon !== this.player.emoticonLabel.text) {
+          if (this.myPlayer?.emoticon) {
+            this.player.emoticonLabel.text = this.myPlayer?.emoticon;
+          } else {
+            this.player.emoticonLabel.text = '';
           }
         }
         this.emitMovement(this.lastLocation);
@@ -606,6 +724,11 @@ class CoveyGameScene extends Phaser.Scene {
       color: '#000000',
       backgroundColor: '#ffffff',
     });
+    this.currentEmoticonLabel = this.add.text(0, 0, '', {
+      font: '18px monospace',
+      color: '#000000',
+      backgroundColor: '#ffffff',
+    });
     // Create a sprite with physics enabled via the physics system. The image used for the sprite
     // has a bit of whitespace, so I'm using setSize & setOffset to control the size of the
     // player's body.
@@ -624,10 +747,16 @@ class CoveyGameScene extends Phaser.Scene {
       color: '#000000',
       backgroundColor: '#ffffff',
     });
+    const emoticonLabel = this.add.text(spawnPoint.x, spawnPoint.y - 40, '', {
+      font: '18px monospace',
+      color: '#000000',
+      backgroundColor: '#ffffff',
+    });
     this.player = {
       sprite,
       label,
-      statusLabel
+      statusLabel,
+      emoticonLabel
     };
 
     /* Configure physics overlap behavior for when the player steps into
@@ -816,6 +945,7 @@ export default function WorldMap(): JSX.Element {
   const playerMovementCallbacks = usePlayerMovement();
   const players = usePlayersInTown();
   const statusMessages = players.map(p => p.statusMessage);
+  const emoticons = players.map(p => p.emoticon);
 
   useEffect(() => {
     const config = {
@@ -858,6 +988,7 @@ export default function WorldMap(): JSX.Element {
       gameScene?.updatePlayerLocation(Player.fromServerPlayer(player));
       // forcing status updates for now
       gameScene?.updatePlayerStatus(Player.fromServerPlayer(player));
+      gameScene?.updatePlayerEmoticon(Player.fromServerPlayer(player));
     };
     playerMovementCallbacks.push(movementDispatcher);
     return () => {
@@ -872,6 +1003,10 @@ export default function WorldMap(): JSX.Element {
   useEffect(() => {
     gameScene?.updatePlayersStatus(players);
   }, [gameScene, players, statusMessages]);
+
+  useEffect(() => {
+    gameScene?.updatePlayersEmoticon(players);
+  }, [gameScene, players, emoticons]);
 
   useEffect(() => {
     gameScene?.updateConversationAreas(conversationAreas);
