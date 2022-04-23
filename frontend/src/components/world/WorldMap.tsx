@@ -747,7 +747,7 @@ class CoveyGameScene extends Phaser.Scene {
       color: '#000000',
       backgroundColor: '#ffffff',
     });
-    const emoticonLabel = this.add.text(spawnPoint.x, spawnPoint.y - 40, '', {
+    const emoticonLabel = this.add.text(spawnPoint.x, spawnPoint.y - 60, '', {
       font: '18px monospace',
       color: '#000000',
       backgroundColor: '#ffffff',
