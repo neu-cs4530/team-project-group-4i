@@ -157,6 +157,15 @@ export default class CoveyTownController {
     this._listeners.forEach(listener => listener.coveyTownListener.onPlayerMoved(player));
   }
 
+
+  // did this to try to imitate how conversation area is implemented, notifying each existing player
+  // of this player's changed status message
+  updatePlayerStatusMessage(player: Player, statusMessage?: string): boolean {
+    player.statusMessage = statusMessage;
+    this._listeners.forEach(listener => listener.coveyTownListener.onPlayerStatusChanged(player));
+    return true;
+  }
+
   /**
    * Removes a player from a conversation area, updating the conversation area's occupants list, 
    * and emitting the appropriate message (area updated or area destroyed)

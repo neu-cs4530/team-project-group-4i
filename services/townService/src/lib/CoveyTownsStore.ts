@@ -117,4 +117,25 @@ export default class CoveyTownsStore {
     return false;
   }
 
+  /**
+   * Updates a player's status message.
+   * @param coveyTownID 
+   * @param myPlayerID
+   * @param statusMessage status message to be used
+   * @returns true upon success, or false otherwise
+   */
+  updatePlayerStatusMessage(coveyTownID: string, myPlayerID: string, statusMessage?: string): boolean {
+    const existingTown = this.getControllerForTown(coveyTownID);
+    if (existingTown) {
+      for (let i = 0; i < existingTown?.players.length; i += 1) {
+        if (existingTown.players[i].id === myPlayerID) {
+          existingTown.players[i].statusMessage = statusMessage;
+          existingTown.updatePlayerStatusMessage(existingTown.players[i], statusMessage);
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
 }
