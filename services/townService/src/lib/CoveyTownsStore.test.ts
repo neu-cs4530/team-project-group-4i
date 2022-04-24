@@ -186,6 +186,122 @@ describe('CoveyTownsStore', () => {
     });
   });
 
+  describe('updatePlayerStatusMessage', () => {
+    it('Should fail if the coveyTownID does not exist', async () => {
+      const res = CoveyTownsStore.getInstance()
+        .updatePlayerStatusMessage('fakeTownID', 'fakePlayerID', 'BRB');
+      expect(res)
+        .toBe(false);
+    });
+    it('Should return false if player does not exist', async () => {
+      const town = createTownForTesting();
+      const player1: Player = new Player('player1');
+      town.addPlayer(player1);
+      const res = CoveyTownsStore.getInstance()
+        .updatePlayerStatusMessage(town.coveyTownID, 'player2ID', 'AFK');
+      expect(res)
+        .toBe(false);
+      expect(town.players.length).toBe(1);
+    });
+    it('Should return true if player exists in town', async () => {
+      const town = createTownForTesting();
+      const player1: Player = new Player('player1');
+      town.addPlayer(player1);
+      expect(town.players[0].statusMessage).toBeUndefined();
+      const res = CoveyTownsStore.getInstance()
+        .updatePlayerStatusMessage(town.coveyTownID, player1.id, 'BRB');
+      expect(res)
+        .toBe(true);
+      expect(town.players.length).toBe(1);
+      expect(town.players[0].statusMessage).toBe('B)');
+    });
+    it('Should update the correct players status message', async () => {
+      const town = createTownForTesting();
+      const player1: Player = new Player('player1');
+      const player2: Player = new Player('player2');
+      const player3: Player = new Player('player3');
+      town.addPlayer(player1);
+      town.addPlayer(player2);
+      town.addPlayer(player3);
+      expect(town.players).toEqual([player1, player2, player3]);
+      const res = CoveyTownsStore.getInstance()
+        .updatePlayerStatusMessage(town.coveyTownID, player3.id, 'AFK');
+      expect(res)
+        .toBe(true);
+      expect(town.players.length).toBe(3);
+      expect(town.players[2].statusMessage).toBe('AFK');
+      expect(town.players[0].statusMessage).toBeUndefined();
+      expect(town.players[1].statusMessage).toBeUndefined();
+    });
+    it('Should be able to update players status message multiple times', async () => {
+      const town = createTownForTesting();
+      const player1: Player = new Player('player1');
+      const player2: Player = new Player('player2');
+      const player3: Player = new Player('player3');
+      town.addPlayer(player1);
+      town.addPlayer(player2);
+      town.addPlayer(player3);
+      expect(town.players).toEqual([player1, player2, player3]);
+      const res = CoveyTownsStore.getInstance()
+        .updatePlayerStatusMessage(town.coveyTownID, player1.id, 'Ready to chat');
+      expect(res)
+        .toBe(true);
+      expect(town.players.length).toBe(3);
+      expect(town.players[1].statusMessage).toBe('Ready to chat');
+      expect(town.players[0].statusMessage).toBeUndefined();
+      expect(town.players[2].statusMessage).toBeUndefined();
+      CoveyTownsStore.getInstance()
+        .updatePlayerStatusMessage(town.coveyTownID, player1.id, 'AFK');
+      expect(town.players[1].statusMessage).toBe('AFK');
+      expect(town.players[0].statusMessage).toBeUndefined();
+      expect(town.players[2].statusMessage).toBeUndefined();
+    });
+    it('Should allow multiple players to have status messages', async () => {
+      const town = createTownForTesting();
+      const player1: Player = new Player('player1');
+      const player2: Player = new Player('player2');
+      const player3: Player = new Player('player3');
+      town.addPlayer(player1);
+      town.addPlayer(player2);
+      town.addPlayer(player3);
+      expect(town.players).toEqual([player1, player2, player3]);
+      const res = CoveyTownsStore.getInstance()
+        .updatePlayerStatusMessage(town.coveyTownID, player1.id, 'Ready to chat');
+      expect(res)
+        .toBe(true);
+      expect(town.players.length).toBe(3);
+      expect(town.players[1].statusMessage).toBe('Ready to chat');
+      expect(town.players[0].statusMessage).toBeUndefined();
+      expect(town.players[2].statusMessage).toBeUndefined();
+      CoveyTownsStore.getInstance()
+        .updatePlayerStatusMessage(town.coveyTownID, player2.id, 'AFK');
+      expect(town.players[1].statusMessage).toBe('Ready to chat');
+      expect(town.players[0].statusMessage).toBe('AFK');
+      expect(town.players[2].statusMessage).toBeUndefined();
+    });
+    it('Should allow empty status message', async () => {
+      const town = createTownForTesting();
+      const player1: Player = new Player(nanoid());
+      const player2: Player = new Player(nanoid());
+      const player3: Player = new Player(nanoid());
+      town.addPlayer(player1);
+      town.addPlayer(player2);
+      town.addPlayer(player3);
+      const res = CoveyTownsStore.getInstance()
+        .updatePlayerStatusMessage(town.coveyTownID, player1.id, 'BRB');
+      expect(res)
+        .toBe(true);
+      expect(town.players[1].statusMessage).toBe('BRB');
+      expect(town.players[0].statusMessage).toBeUndefined();
+      expect(town.players[2].statusMessage).toBeUndefined();
+      CoveyTownsStore.getInstance()
+        .updatePlayerStatusMessage(town.coveyTownID, player1.id, '');
+      expect(town.players[1].statusMessage).toBe('');
+      expect(town.players[0].statusMessage).toBeUndefined();
+      expect(town.players[2].statusMessage).toBeUndefined();
+    });
+  });
+
   describe('updatePlayerEmoticon', () => {
     it('Should fail if the coveyTownID does not exist', async () => {
       const res = CoveyTownsStore.getInstance()
