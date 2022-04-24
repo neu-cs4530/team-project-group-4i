@@ -213,7 +213,7 @@ describe('CoveyTownsStore', () => {
       expect(res)
         .toBe(true);
       expect(town.players.length).toBe(1);
-      expect(town.players[0].statusMessage).toBe('B)');
+      expect(town.players[0].statusMessage).toBe('BRB');
     });
     it('Should update the correct players status message', async () => {
       const town = createTownForTesting();
@@ -247,13 +247,13 @@ describe('CoveyTownsStore', () => {
       expect(res)
         .toBe(true);
       expect(town.players.length).toBe(3);
-      expect(town.players[1].statusMessage).toBe('Ready to chat');
-      expect(town.players[0].statusMessage).toBeUndefined();
+      expect(town.players[0].statusMessage).toBe('Ready to chat');
+      expect(town.players[1].statusMessage).toBeUndefined();
       expect(town.players[2].statusMessage).toBeUndefined();
       CoveyTownsStore.getInstance()
         .updatePlayerStatusMessage(town.coveyTownID, player1.id, 'AFK');
-      expect(town.players[1].statusMessage).toBe('AFK');
-      expect(town.players[0].statusMessage).toBeUndefined();
+      expect(town.players[0].statusMessage).toBe('AFK');
+      expect(town.players[1].statusMessage).toBeUndefined();
       expect(town.players[2].statusMessage).toBeUndefined();
     });
     it('Should allow multiple players to have status messages', async () => {
@@ -270,13 +270,13 @@ describe('CoveyTownsStore', () => {
       expect(res)
         .toBe(true);
       expect(town.players.length).toBe(3);
-      expect(town.players[1].statusMessage).toBe('Ready to chat');
-      expect(town.players[0].statusMessage).toBeUndefined();
+      expect(town.players[0].statusMessage).toBe('Ready to chat');
+      expect(town.players[1].statusMessage).toBeUndefined();
       expect(town.players[2].statusMessage).toBeUndefined();
       CoveyTownsStore.getInstance()
         .updatePlayerStatusMessage(town.coveyTownID, player2.id, 'AFK');
-      expect(town.players[1].statusMessage).toBe('Ready to chat');
-      expect(town.players[0].statusMessage).toBe('AFK');
+      expect(town.players[0].statusMessage).toBe('Ready to chat');
+      expect(town.players[1].statusMessage).toBe('AFK');
       expect(town.players[2].statusMessage).toBeUndefined();
     });
     it('Should allow empty status message', async () => {
@@ -288,14 +288,14 @@ describe('CoveyTownsStore', () => {
       town.addPlayer(player2);
       town.addPlayer(player3);
       const res = CoveyTownsStore.getInstance()
-        .updatePlayerStatusMessage(town.coveyTownID, player1.id, 'BRB');
+        .updatePlayerStatusMessage(town.coveyTownID, player2.id, 'BRB');
       expect(res)
         .toBe(true);
       expect(town.players[1].statusMessage).toBe('BRB');
       expect(town.players[0].statusMessage).toBeUndefined();
       expect(town.players[2].statusMessage).toBeUndefined();
       CoveyTownsStore.getInstance()
-        .updatePlayerStatusMessage(town.coveyTownID, player1.id, '');
+        .updatePlayerStatusMessage(town.coveyTownID, player2.id, '');
       expect(town.players[1].statusMessage).toBe('');
       expect(town.players[0].statusMessage).toBeUndefined();
       expect(town.players[2].statusMessage).toBeUndefined();
