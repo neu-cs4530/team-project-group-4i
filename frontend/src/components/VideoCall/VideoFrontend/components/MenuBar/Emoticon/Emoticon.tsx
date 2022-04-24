@@ -28,7 +28,7 @@ export default function Emoticon() {
     }catch(err){
       toast({
         title: 'Unable to update emoticon',
-        description: err.toString(),
+        description: String(err),
         status: 'error'
       });
     }
@@ -80,6 +80,9 @@ export default function Emoticon() {
         </MenuItem>
         <MenuItem onClick={() => updateSelectedEmoticon(EmoticonTypes.SLANTY)}>
           <Typography>{EmoticonTypes.SLANTY}</Typography>
+        </MenuItem>
+        <MenuItem onClick={() => updateSelectedEmoticon('')}>
+          <Typography>Clear Emoticon</Typography>
         </MenuItem>
       </MenuContainer>
     </>
