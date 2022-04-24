@@ -4,6 +4,7 @@ import CoveyTownListener from '../types/CoveyTownListener';
 import Player from '../types/Player';
 import { ServerConversationArea } from '../client/TownsServiceClient';
 import { ChatMessage } from '../CoveyTypes';
+import { PlayerCoveyTownListener } from '../types/PlayerCoveyTownListener';
 
 const mockCoveyListenerTownDestroyed = jest.fn();
 const mockCoveyListenerOtherFns = jest.fn();
@@ -29,6 +30,19 @@ function mockCoveyListener(): CoveyTownListener {
     onChatMessage(message: ChatMessage){
       mockCoveyListenerOtherFns(message);
     },
+    onPlayerStatusChanged(changedStatusPlayer: Player){
+      mockCoveyListenerOtherFns(changedStatusPlayer);
+    },
+    onPlayerEmoticonUpdated(changedEmoticonPlayer: Player){
+      mockCoveyListenerOtherFns(changedEmoticonPlayer);
+    },
+  };
+}
+
+function mockPlayerCoveyTownListener(): PlayerCoveyTownListener {
+  return {
+    coveyTownListener: mockCoveyListener(),
+    playerUsername: 'username',
   };
 }
 
@@ -159,16 +173,132 @@ describe('CoveyTownsStore', () => {
     });
     it('Should disconnect all players', async () => {
       const town = createTownForTesting();
-      town.addTownListener(mockCoveyListener());
-      town.addTownListener(mockCoveyListener());
-      town.addTownListener(mockCoveyListener());
-      town.addTownListener(mockCoveyListener());
+      town.addTownListener(mockPlayerCoveyTownListener());
+      town.addTownListener(mockPlayerCoveyTownListener());
+      town.addTownListener(mockPlayerCoveyTownListener());
+      town.addTownListener(mockPlayerCoveyTownListener());
       town.disconnectAllPlayers();
 
       expect(mockCoveyListenerOtherFns.mock.calls.length)
         .toBe(0);
       expect(mockCoveyListenerTownDestroyed.mock.calls.length)
         .toBe(4);
+    });
+  });
+
+  describe('updatePlayerEmoticon', () => {
+    it('Should fail if the coveyTownID does not exist', async () => {
+      const res = CoveyTownsStore.getInstance()
+        .updatePlayerEmoticon('fakeTownID', 'fakePlayer', ':)');
+      expect(res)
+        .toBe(false);
+    });
+    it('Should return false if player does not exist', async () => {
+      const town = createTownForTesting();
+      const player1: Player = new Player('player1');
+      town.addPlayer(player1);
+      const res = CoveyTownsStore.getInstance()
+        .updatePlayerEmoticon(town.coveyTownID, 'player2', 'B)');
+      expect(res)
+        .toBe(false);
+      expect(town.players.length).toBe(1);
+    });
+    it('Should return true if player exists in town', async () => {
+      const town = createTownForTesting();
+      const player1: Player = new Player('player1');
+      town.addPlayer(player1);
+      expect(town.players[0].emoticon).toBeUndefined();
+      const res = CoveyTownsStore.getInstance()
+        .updatePlayerEmoticon(town.coveyTownID, player1.id, 'B)');
+      expect(res)
+        .toBe(true);
+      expect(town.players.length).toBe(1);
+      expect(town.players[0].emoticon).toBe('B)');
+    });
+    it('Should update the correct players emoticon', async () => {
+      const town = createTownForTesting();
+      const snape: Player = new Player('snape');
+      const hagrid: Player = new Player('hagrid');
+      const ron: Player = new Player('ron');
+      town.addPlayer(snape);
+      town.addPlayer(hagrid);
+      town.addPlayer(ron);
+      expect(town.players).toEqual([snape, hagrid, ron]);
+      const res = CoveyTownsStore.getInstance()
+        .updatePlayerEmoticon(town.coveyTownID, ron.id, 'B)');
+      expect(res)
+        .toBe(true);
+      expect(town.players.length).toBe(3);
+      expect(town.players[2].emoticon).toBe('B)');
+      expect(town.players[0].emoticon).toBeUndefined();
+      expect(town.players[1].emoticon).toBeUndefined();
+    });
+    it('Should be able to update players emoticon multiple times', async () => {
+      const town = createTownForTesting();
+      const snape: Player = new Player('snape');
+      const hagrid: Player = new Player('hagrid');
+      const ron: Player = new Player('ron');
+      town.addPlayer(snape);
+      town.addPlayer(hagrid);
+      town.addPlayer(ron);
+      expect(town.players).toEqual([snape, hagrid, ron]);
+      const res = CoveyTownsStore.getInstance()
+        .updatePlayerEmoticon(town.coveyTownID, hagrid.id, ':(');
+      expect(res)
+        .toBe(true);
+      expect(town.players.length).toBe(3);
+      expect(town.players[1].emoticon).toBe(':(');
+      expect(town.players[0].emoticon).toBeUndefined();
+      expect(town.players[2].emoticon).toBeUndefined();
+      CoveyTownsStore.getInstance()
+        .updatePlayerEmoticon(town.coveyTownID, hagrid.id, ':)');
+      expect(town.players[1].emoticon).toBe(':)');
+      expect(town.players[0].emoticon).toBeUndefined();
+      expect(town.players[2].emoticon).toBeUndefined();
+    });
+    it('Should allow multiple players to have emoticons', async () => {
+      const town = createTownForTesting();
+      const snape: Player = new Player('snape');
+      const hagrid: Player = new Player('hagrid');
+      const ron: Player = new Player('ron');
+      town.addPlayer(snape);
+      town.addPlayer(hagrid);
+      town.addPlayer(ron);
+      expect(town.players).toEqual([snape, hagrid, ron]);
+      const res = CoveyTownsStore.getInstance()
+        .updatePlayerEmoticon(town.coveyTownID, hagrid.id, ':(');
+      expect(res)
+        .toBe(true);
+      expect(town.players.length).toBe(3);
+      expect(town.players[1].emoticon).toBe(':(');
+      expect(town.players[0].emoticon).toBeUndefined();
+      expect(town.players[2].emoticon).toBeUndefined();
+      CoveyTownsStore.getInstance()
+        .updatePlayerEmoticon(town.coveyTownID, snape.id, ';)');
+      expect(town.players[1].emoticon).toBe(':(');
+      expect(town.players[0].emoticon).toBe(';)');
+      expect(town.players[2].emoticon).toBeUndefined();
+    });
+    it('Should allow empty emoticon', async () => {
+      const town = createTownForTesting();
+      const snape: Player = new Player('snape');
+      const hagrid: Player = new Player('hagrid');
+      const ron: Player = new Player('ron');
+      town.addPlayer(snape);
+      town.addPlayer(hagrid);
+      town.addPlayer(ron);
+      const res = CoveyTownsStore.getInstance()
+        .updatePlayerEmoticon(town.coveyTownID, hagrid.id, ':(');
+      expect(res)
+        .toBe(true);
+      expect(town.players[1].emoticon).toBe(':(');
+      expect(town.players[0].emoticon).toBeUndefined();
+      expect(town.players[2].emoticon).toBeUndefined();
+      CoveyTownsStore.getInstance()
+        .updatePlayerEmoticon(town.coveyTownID, hagrid.id, '');
+      expect(town.players[1].emoticon).toBe('');
+      expect(town.players[0].emoticon).toBeUndefined();
+      expect(town.players[2].emoticon).toBeUndefined();
     });
   });
 
