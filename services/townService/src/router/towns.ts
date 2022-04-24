@@ -157,7 +157,6 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
         coveyTownID: req.body.coveyTownID,
         myPlayerID: req.params.myPlayerID,
         statusMessage: req.body.statusMessage,
-        sessionToken: req.body.sessionToken
       });
       res.status(StatusCodes.OK)
         .json(result);

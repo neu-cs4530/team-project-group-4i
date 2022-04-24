@@ -98,7 +98,6 @@ export interface PlayerStatusMessageUpdateRequest {
   coveyTownID: string;
   myPlayerID: string;
   statusMessage?: string;
-  sessionToken: string;
 }
 
 /**
@@ -337,11 +336,6 @@ export function townSubscriptionHandler(socket: Socket): void {
   socket.on('disconnect', () => {
     townController.removeTownListener(listener);
     townController.destroySession(s);
-  });
-
-  // second time updatePlayerStatusMessage is called, this is unnecessary?
-  socket.on('playerStatusChanged', (changedStatusPlayer: Player) => {
-    townController.updatePlayerStatusMessage(changedStatusPlayer, changedStatusPlayer.statusMessage);
   });
 
   socket.on('playerEmoticonUpdated', (changedEmoticonPlayer: Player) => {

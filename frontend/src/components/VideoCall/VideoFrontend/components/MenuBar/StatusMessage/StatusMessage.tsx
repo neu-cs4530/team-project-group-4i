@@ -11,14 +11,13 @@ export default function StatusMessage() {
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
   const [statusOpen, setStatusOpen] = useState(false);
   const anchorRef = useRef<HTMLButtonElement>(null);
-  const [statusEnabled, setStatus] = useState(false);
-  const { apiClient, myPlayerID, currentTownID, sessionToken } = useCoveyAppState();
+  const { apiClient, myPlayerID, currentTownID } = useCoveyAppState();
   const toast = useToast();
 
   const updateSelectedStatusMessage = async (statusMessage: string) => {
     try{
       await apiClient.updatePlayerStatusMessage({coveyTownID: currentTownID,
-        myPlayerID: myPlayerID, statusMessage: statusMessage, sessionToken: sessionToken});
+        myPlayerID: myPlayerID, statusMessage: statusMessage});
       toast({
         title: 'Status updated.',
         status: 'success'

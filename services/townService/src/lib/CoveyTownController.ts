@@ -157,10 +157,12 @@ export default class CoveyTownController {
   }
 
 
-  // did this to try to imitate how conversation area is implemented, notifying each existing player
-  // of this player's changed status message
-  updatePlayerStatusMessage(player: Player, statusMessage?: string): boolean {
-    player.statusMessage = statusMessage;
+  /**
+   * Notifies all listeners that the status message for the given player has been updated.
+   * 
+   * @param player Player to update status message for
+   */
+  updatePlayerStatusMessage(player: Player): boolean {
     this._listeners.forEach(listener => listener.coveyTownListener.onPlayerStatusChanged(player));
     return true;
   }

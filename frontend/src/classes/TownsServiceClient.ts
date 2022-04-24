@@ -95,7 +95,6 @@ export interface PlayerEmoticonUpdateRequest {
   coveyTownID: string;
   myPlayerID: string;
   statusMessage?: string;
-  sessionToken: string;
 }
 
 export interface ConversationCreateRequest {
