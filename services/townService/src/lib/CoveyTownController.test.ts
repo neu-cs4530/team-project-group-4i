@@ -1,4 +1,4 @@
-/** import { nanoid } from 'nanoid';
+/**   import { nanoid } from 'nanoid';
 import { mock, mockDeep, mockReset } from 'jest-mock-extended';
 import { Socket } from 'socket.io';
 import TwilioVideo from './TwilioVideo';
@@ -289,4 +289,4 @@ describe('CoveyTownController', () => {
       expect(mockListener.onConversationAreaUpdated).toHaveBeenCalledTimes(1);
     });
   });
-}); **/
+});   **/
