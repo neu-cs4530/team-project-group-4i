@@ -12,7 +12,6 @@ export default function Emoticon() {
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
   const [statusOpen, setStatusOpen] = useState(false);
   const anchorRef = useRef<HTMLButtonElement>(null);
-  const [statusEnabled, setStatus] = useState(false);
   const {apiClient, myPlayerID, currentTownID } = useCoveyAppState();
   const toast = useToast()
 

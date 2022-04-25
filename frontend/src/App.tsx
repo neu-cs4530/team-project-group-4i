@@ -230,7 +230,7 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
         setPlayersStatusMessages(localPlayers.map(p => p.statusMessage));
         setPlayersInTown(localPlayers);
       });
-      socket.on('playerEmoticonUpdated', (player: ServerPlayer) => { // TODO: function name
+      socket.on('playerEmoticonUpdated', (player: ServerPlayer) => {
         const updatedPlayer = localPlayers.find(
           p => p.id === player._id
         );

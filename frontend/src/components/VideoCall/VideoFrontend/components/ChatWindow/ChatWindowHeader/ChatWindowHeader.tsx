@@ -36,14 +36,15 @@ export default function ChatWindowHeader({onRecipientChange}: any) {
   const { userName } = useCoveyAppState();
   const playersInTown = usePlayersInTown();
   const collator = new Intl.Collator('en', { numeric: true, sensitivity: 'base' });
+  const MAX_USERNAME_LENGTH = 10;
 
   return (
     <div className={classes.container}>
       <div className={classes.text}>Chat</div>
-      <select onChange = {(e) =>
-              onRecipientChange(e.target.value)}>
-        
-        <option value={"Everyone"} selected>
+      <select onChange={(e) =>
+        onRecipientChange(e.target.value)}
+        defaultValue={'Everyone'}>
+        <option value={'Everyone'} disabled>
           Everyone
         </option>
         {
@@ -51,7 +52,7 @@ export default function ChatWindowHeader({onRecipientChange}: any) {
             .sort((player1, player2) => collator.compare(player1.userName, player2.userName))
             .map(player => 
             <option value={player.userName}>
-              {player.userName}
+              {`${player.userName.substring(0, MAX_USERNAME_LENGTH)}${player.userName.length > 10 ? '...' : ''}`}
             </option>)
         }
       </select>
