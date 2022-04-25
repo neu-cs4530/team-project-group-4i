@@ -85,7 +85,7 @@ export interface TownUpdateRequest {
 export interface PlayerEmoticonUpdateRequest {
   coveyTownID: string;
   myPlayerID: string;
-  emoticon?: string; // TODO: may need seesionToken
+  emoticon?: string;
 }
 
 /**
