@@ -523,7 +523,7 @@ class CoveyGameScene extends Phaser.Scene {
       this.player.statusLabel?.setX(body.x);
       this.player.statusLabel?.setY(body.y - 40);
       this.player.emoticonLabel?.setX(body.x);
-      this.player.emoticonLabel?.setY(body.y - 60); // TODO spacing
+      this.player.emoticonLabel?.setY(body.y - 60);
       if (
         !this.lastLocation ||
         this.lastLocation.x !== body.x ||

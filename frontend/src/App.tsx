@@ -233,7 +233,7 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
         // tried resetting players in town when this is called
         setPlayersInTown(localPlayers);
       });
-      socket.on('playerEmoticonUpdated', (player: ServerPlayer) => { // TODO: function name
+      socket.on('playerEmoticonUpdated', (player: ServerPlayer) => {
         const updatedPlayer = localPlayers.find(
           p => p.id === player._id
         );
