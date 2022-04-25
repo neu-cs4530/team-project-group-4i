@@ -151,13 +151,13 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
   /**
    * Update a player's status message.
    */
-   app.patch('/players/:myPlayerID/status', express.json(), async (req, res) => {
+  app.patch('/players/:myPlayerID/status', express.json(), async (req, res) => {
     try {
       const result = playerStatusMessageUpdateHandler({
         coveyTownID: req.body.coveyTownID,
         myPlayerID: req.params.myPlayerID,
         statusMessage: req.body.statusMessage,
-        sessionToken: req.body.sessionToken
+        sessionToken: req.body.sessionToken,
       });
       res.status(StatusCodes.OK)
         .json(result);
