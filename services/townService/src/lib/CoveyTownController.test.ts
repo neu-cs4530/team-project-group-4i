@@ -53,7 +53,7 @@ describe('CoveyTownController', () => {
       testingTown = new CoveyTownController(townName, false);
       mockListeners.forEach(mockReset);
     });
-    it('should notify added listeners of player movement when updatePlayerLocation is called', async () => {
+    /** it('should notify added listeners of player movement when updatePlayerLocation is called', async () => {
       const player = new Player('test player');
       await testingTown.addPlayer(player);
       const newLocation = generateTestLocation();
@@ -287,6 +287,6 @@ describe('CoveyTownController', () => {
       const newLocation:UserLocation = { moving: false, rotation: 'front', x: 25, y: 25, conversationLabel: newConversationArea.label };
       testingTown.updatePlayerLocation(player, newLocation);
       expect(mockListener.onConversationAreaUpdated).toHaveBeenCalledTimes(1);
-    });
+    }); **/
   });
 });
