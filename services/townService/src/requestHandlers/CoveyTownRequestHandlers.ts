@@ -278,7 +278,6 @@ function townSocketAdapter(socket: Socket): CoveyTownListener {
       socket.emit('playerEmoticonUpdated', changedEmoticonPlayer);
     },
     onPlayerStatusChanged(changedStatusPlayer: Player) {
-      // console.log('requesthandler');
       socket.emit('playerStatusChanged', changedStatusPlayer);
     },
     onPlayerDisconnected(removedPlayer: Player) {

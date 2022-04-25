@@ -36,7 +36,6 @@ export default function StatusMessage() {
       <Button
         onClick={() => setStatusOpen(isOpen => !isOpen)}
         ref={anchorRef}
-        // className={props.buttonClassName}
         data-cy-more-button
       >
         {isMobile ? (

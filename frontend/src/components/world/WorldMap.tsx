@@ -59,8 +59,6 @@ class CoveyGameScene extends Phaser.Scene {
 
   private currentConversationArea?: ConversationGameObjects;
 
-  // tried somehow imitating currentConversationArea, not sure how to update this consistently with
-  // new text
   private currentStatusLabel?: Phaser.GameObjects.Text;
 
   private currentEmoticonLabel?: Phaser.GameObjects.Text;
@@ -139,7 +137,6 @@ class CoveyGameScene extends Phaser.Scene {
         };
         eachNewArea.addListener(updateListener);
         updateListener.onTopicChange(eachNewArea.topic);
-        // console.log(eachNewArea.topic);
       }
     });
     this.conversationAreas.forEach(eachArea => {
@@ -148,7 +145,6 @@ class CoveyGameScene extends Phaser.Scene {
         eachArea.conversationArea = undefined;
       }
     });
-    // this.updatePlayersStatus(this.players);
   }
 
   updatePlayersLocations(players: Player[]) {
@@ -269,7 +265,6 @@ class CoveyGameScene extends Phaser.Scene {
     if (this.physics && player.location) {
       const { sprite } = myPlayer;
       if (!sprite || !sprite.anims) return;
-      // needs to call some player status update, handles whatever given option
       const updateListener = {
         onStatusChange: (newStatus: string | undefined) => {
           if (newStatus && myPlayer) {
@@ -282,13 +277,10 @@ class CoveyGameScene extends Phaser.Scene {
                 backgroundColor: '#ffffff',
               });
               myPlayer.statusLabel = statusLabel;
-              // this.player.statusLabel = statusLabel;
-              // this.player.statusLabel.text = newStatus;
               myPlayer.statusMessage = newStatus;
             }
           } else if (myPlayer && myPlayer.statusLabel && !newStatus) {
             myPlayer.statusLabel.text = '';
-            // this.player.statusLabel.text = '';
           }
           else if (myPlayer && this.player && !newStatus) {
             const statusLabel = this.add.text(0, 0, '', {
@@ -298,7 +290,6 @@ class CoveyGameScene extends Phaser.Scene {
             });
             myPlayer.statusLabel = statusLabel;
             myPlayer.statusMessage = '';
-            // this.player.statusLabel.text = '';
           }
           if (player.id === this.myPlayerID) {
             this.update();
@@ -446,8 +437,6 @@ class CoveyGameScene extends Phaser.Scene {
       this.player.label.setX(body.x);
       this.player.label.setY(body.y - 20);
       if (this.currentStatusLabel) {
-        // this.player.statusLabel.text = 'my status';
-        // this is what updates the label text, unsure how to get current status label accurately
         this.player.statusLabel.text = this.currentStatusLabel.text;
       }
       if (this.currentEmoticonLabel) {
@@ -465,13 +454,10 @@ class CoveyGameScene extends Phaser.Scene {
                 backgroundColor: '#ffffff',
               });
               this.myPlayer.statusLabel = statusLabel;
-              // this.player.statusLabel = statusLabel;
-              // this.player.statusLabel.text = newStatus;
               this.myPlayer.statusMessage = newStatus;
             }
           } else if (this.player && this.player.statusLabel && !newStatus) {
             this.player.statusLabel.text = '';
-            // this.player.statusLabel.text = '';
           }
           else if (this.player && !newStatus) {
             const statusLabel = this.add.text(0, 0, '', {
