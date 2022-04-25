@@ -134,8 +134,6 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
   const [playerMovementCallbacks] = useState<PlayerMovementCallback[]>([]);
   const [playersInTown, setPlayersInTown] = useState<Player[]>([]);
   const [nearbyPlayers, setNearbyPlayers] = useState<Player[]>([]);
-  // tried imitating however playersInTown is used, but a list of the player status messages
-  // probably isn't necessary..
   const [playersStatusMessages, setPlayersStatusMessages] = useState<(string | undefined)[]>([]);
   const [playersEmoticons, setPlayersEmoticons] = useState<(string | undefined)[]>([]);
   // const [currentLocation, setCurrentLocation] = useState<UserLocation>({moving: false, rotation: 'front', x: 0, y: 0});
@@ -230,7 +228,6 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
           updatedPlayer.statusMessage = player.statusMessage;
         }
         setPlayersStatusMessages(localPlayers.map(p => p.statusMessage));
-        // tried resetting players in town when this is called
         setPlayersInTown(localPlayers);
       });
       socket.on('playerEmoticonUpdated', (player: ServerPlayer) => {
