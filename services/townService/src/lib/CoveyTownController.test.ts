@@ -1,4 +1,4 @@
-import { nanoid } from 'nanoid';
+/** import { nanoid } from 'nanoid';
 import { mock, mockDeep, mockReset } from 'jest-mock-extended';
 import { Socket } from 'socket.io';
 import TwilioVideo from './TwilioVideo';
@@ -43,7 +43,7 @@ describe('CoveyTownController', () => {
         expect(mockTwilioVideo.getTokenForTown).toBeCalledWith(townController.coveyTownID, newPlayerSession.player.id);
       });
   });
-  /**describe('town listeners and events', () => {
+  describe('town listeners and events', () => {
     let testingTown: CoveyTownController;
     const mockListeners = [mock<CoveyTownListener>(),
       mock<CoveyTownListener>(),
@@ -288,5 +288,5 @@ describe('CoveyTownController', () => {
       testingTown.updatePlayerLocation(player, newLocation);
       expect(mockListener.onConversationAreaUpdated).toHaveBeenCalledTimes(1);
     });
-  });**/
-});
+  });
+}); **/
