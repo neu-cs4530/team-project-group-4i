@@ -1006,7 +1006,7 @@ export default function WorldMap(): JSX.Element {
 
   useEffect(() => {
     gameScene?.updatePlayersEmoticon(players);
-  }, [gameScene, players]);
+  }, [gameScene, players, emoticons]);
 
   useEffect(() => {
     gameScene?.updateConversationAreas(conversationAreas);
